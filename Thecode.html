@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI PR Reviewer - Intelligent Code Review Agent</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-clike.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-css.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .main-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .platform-selector {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            justify-content: center;
+        }
+
+        .platform-btn {
+            padding: 12px 24px;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .platform-btn:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
+
+        .platform-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .input-section {
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .input-group input,
+        .input-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+        }
+
+        .input-group input:focus,
+        .input-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .code-input {
+            min-height: 200px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .review-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .review-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .review-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            display: none;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .results {
+            display: none;
+            margin-top: 30px;
+        }
+
+        .summary-card {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid #667eea;
+        }
+
+        .severity-critical { border-left-color: #dc2626; }
+        .severity-high { border-left-color: #ea580c; }
+        .severity-medium { border-left-color: #d97706; }
+        .severity-low { border-left-color: #16a34a; }
+        .severity-info { border-left-color: #0ea5e9; }
+
+        .severity-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-right: 10px;
+        }
+
+        .badge-critical { background: #fee2e2; color: #dc2626; }
+        .badge-high { background: #fed7aa; color: #ea580c; }
+        .badge-medium { background: #fef3c7; color: #d97706; }
+        .badge-low { background: #dcfce7; color: #16a34a; }
+        .badge-info { background: #dbeafe; color: #0ea5e9; }
+
+        .issue-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .issue-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .issue-title {
+            font-weight: 600;
+            margin-left: 10px;
+            flex-grow: 1;
+        }
+
+        .issue-description {
+            color: #6b7280;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        .code-snippet {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+
+        .line-number {
+            color: #858585;
+            margin-right: 15px;
+            user-select: none;
+        }
+
+        .suggestion {
+            background: #f0f9ff;
+            border: 1px solid #0ea5e9;
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 12px;
+        }
+
+        .suggestion-title {
+            font-weight: 600;
+            color: #0ea5e9;
+            margin-bottom: 8px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            border: 2px solid #e5e7eb;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            color: #6b7280;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 AI PR Reviewer</h1>
+            <p>Intelligent code review agent with security, performance, and logic analysis</p>
+        </div>
+
+        <div class="main-card">
+            <div class="platform-selector">
+                <div class="platform-btn active" data-platform="github">
+                    🐙 GitHub
+                </div>
+                <div class="platform-btn" data-platform="gitlab">
+                    🦊 GitLab
+                </div>
+                <div class="platform-btn" data-platform="cli">
+                    💻 Standalone CLI
+                </div>
+            </div>
+
+            <div class="input-section">
+                <div class="input-group">
+                    <label for="commit-message">Commit Message / PR Title</label>
+                    <input type="text" id="commit-message" placeholder="e.g., Fix authentication bug in user login flow">
+                </div>
+
+                <div class="input-group">
+                    <label for="pr-description">PR Description (Optional)</label>
+                    <textarea id="pr-description" rows="3" placeholder="Detailed description of changes made..."></textarea>
+                </div>
+
+                <div class="input-group">
+                    <label for="code-changes">Code Changes (Diff Format)</label>
+                    <textarea id="code-changes" class="code-input" placeholder="Paste your code diff here...
+Example:
+@@ -1,4 +1,6 @@
+ function authenticateUser(username, password) {
+-    return username === 'admin' && password === 'password';
++    const hashedPassword = hashPassword(password);
++    return username === 'admin' && hashedPassword === getStoredHash('admin');
+ }"></textarea>
+                </div>
+
+                <div class="input-group">
+                    <label for="file-language">Primary Language</label>
+                    <select id="file-language">
+                        <option value="javascript">JavaScript</option>
+                        <option value="python">Python</option>
+                        <option value="java">Java</option>
+                        <option value="csharp">C#</option>
+                        <option value="go">Go</option>
+                        <option value="rust">Rust</option>
+                        <option value="php">PHP</option>
+                        <option value="ruby">Ruby</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+            </div>
+
+            <button class="review-btn" onclick="startReview()">
+                🔍 Start AI Review
+            </button>
+
+            <div class="loading">
+                <div class="spinner"></div>
+                <p>Analyzing code changes and generating intelligent review...</p>
+            </div>
+
+            <div class="results">
+                <div class="summary-card">
+                    <h3>📊 Review Summary</h3>
+                    <div class="stats-grid" id="stats-grid">
+                        <!-- Stats will be inserted here -->
+                    </div>
+                </div>
+
+                <div class="tabs">
+                    <div class="tab active" onclick="switchTab('issues')">🚨 Issues Found</div>
+                    <div class="tab" onclick="switchTab('suggestions')">💡 Suggestions</div>
+                    <div class="tab" onclick="switchTab('security')">🔒 Security Analysis</div>
+                    <div class="tab" onclick="switchTab('performance')">⚡ Performance</div>
+                </div>
+
+                <div class="tab-content active" id="issues-content">
+                    <!-- Issues will be inserted here -->
+                </div>
+
+                <div class="tab-content" id="suggestions-content">
+                    <!-- Suggestions will be inserted here -->
+                </div>
+
+                <div class="tab-content" id="security-content">
+                    <!-- Security analysis will be inserted here -->
+                </div>
+
+                <div class="tab-content" id="performance-content">
+                    <!-- Performance analysis will be inserted here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentPlatform = 'github';
+        let currentTab = 'issues';
+
+        // Platform selection
+        document.querySelectorAll('.platform-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.platform-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentPlatform = btn.dataset.platform;
+            });
+        });
+
+        function switchTab(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelector(`.tab:nth-child(${getTabIndex(tabName)})`).classList.add('active');
+            
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            document.getElementById(`${tabName}-content`).classList.add('active');
+            
+            currentTab = tabName;
+        }
+
+        function getTabIndex(tabName) {
+            const tabMap = { 'issues': 1, 'suggestions': 2, 'security': 3, 'performance': 4 };
+            return tabMap[tabName] || 1;
+        }
+
+        function startReview() {
+            const commitMessage = document.getElementById('commit-message').value;
+            const codeChanges = document.getElementById('code-changes').value;
+
+            if (!commitMessage.trim() || !codeChanges.trim()) {
+                alert('Please provide both commit message and code changes');
+                return;
+            }
+
+            // Show loading
+            document.querySelector('.loading').style.display = 'block';
+            document.querySelector('.results').style.display = 'none';
+            document.querySelector('.review-btn').disabled = true;
+
+            // Simulate AI analysis
+            setTimeout(() => {
+                generateReview(commitMessage, codeChanges);
+                document.querySelector('.loading').style.display = 'none';
+                document.querySelector('.results').style.display = 'block';
+                document.querySelector('.review-btn').disabled = false;
+            }, 3000);
+        }
+
+        function generateReview(commitMessage, codeChanges) {
+            const language = document.getElementById('file-language').value;
+            const prDescription = document.getElementById('pr-description').value;
+
+            // Analyze the code and generate intelligent feedback
+            const analysis = analyzeCode(commitMessage, codeChanges, language, prDescription);
+            
+            // Update stats
+            updateStats(analysis.stats);
+            
+            // Generate content for each tab
+            generateIssuesContent(analysis.issues);
+            generateSuggestionsContent(analysis.suggestions);
+            generateSecurityContent(analysis.security);
+            generatePerformanceContent(analysis.performance);
+        }
+
+        function analyzeCode(commitMessage, codeChanges, language, description) {
+            // Intelligent code analysis logic
+            const issues = [];
+            const suggestions = [];
+            const security = [];
+            const performance = [];
+
+            // Analyze patterns in the code
+            if (codeChanges.includes('password') && codeChanges.includes('===')) {
+                security.push({
+                    severity: 'critical',
+                    title: 'Hardcoded Password Comparison',
+                    description: 'Direct password comparison without hashing detected. This is a critical security vulnerability.',
+                    line: findLineNumber(codeChanges, 'password'),
+                    suggestion: 'Use proper password hashing (bcrypt, scrypt, or Argon2) and compare hashed values.',
+                    code: extractCodeSnippet(codeChanges, 'password')
+                });
+            }
+
+            if (codeChanges.includes('SQL') || codeChanges.includes('SELECT') || codeChanges.includes('INSERT')) {
+                security.push({
+                    severity: 'high',
+                    title: 'Potential SQL Injection',
+                    description: 'Raw SQL queries detected. Ensure proper parameterization to prevent SQL injection.',
+                    line: findLineNumber(codeChanges, 'SELECT'),
+                    suggestion: 'Use parameterized queries or ORM methods instead of string concatenation.',
+                    code: extractCodeSnippet(codeChanges, 'SELECT')
+                });
+            }
+
+            if (codeChanges.includes('for') && codeChanges.includes('length')) {
+                performance.push({
+                    severity: 'medium',
+                    title: 'Loop Performance Optimization',
+                    description: 'Loop accessing .length property multiple times can be optimized.',
+                    line: findLineNumber(codeChanges, 'for'),
+                    suggestion: 'Cache the length value before the loop to avoid repeated property access.',
+                    code: extractCodeSnippet(codeChanges, 'for')
+                });
+            }
+
+            if (codeChanges.includes('console.log')) {
+                issues.push({
+                    severity: 'low',
+                    title: 'Debug Code Left in Production',
+                    description: 'Console.log statements found in the code.',
+                    line: findLineNumber(codeChanges, 'console.log'),
+                    suggestion: 'Remove console.log statements or replace with proper logging framework.',
+                    code: extractCodeSnippet(codeChanges, 'console.log')
+                });
+            }
+
+            // Check for missing error handling
+            if (codeChanges.includes('async') && !codeChanges.includes('try') && !codeChanges.includes('catch')) {
+                issues.push({
+                    severity: 'high',
+                    title: 'Missing Error Handling',
+                    description: 'Async function without proper error handling detected.',
+                    line: findLineNumber(codeChanges, 'async'),
+                    suggestion: 'Add try-catch blocks to handle potential async errors.',
+                    code: extractCodeSnippet(codeChanges, 'async')
+                });
+            }
+
+            // Generate suggestions based on commit message
+            if (commitMessage.toLowerCase().includes('fix') || commitMessage.toLowerCase().includes('bug')) {
+                suggestions.push({
+                    title: 'Add Unit Tests',
+                    description: 'Since this is a bug fix, consider adding unit tests to prevent regression.',
+                    priority: 'high'
+                });
+            }
+
+            if (commitMessage.toLowerCase().includes('performance')) {
+                suggestions.push({
+                    title: 'Add Performance Benchmarks',
+                    description: 'Consider adding benchmark tests to measure performance improvements.',
+                    priority: 'medium'
+                });
+            }
+
+            const stats = {
+                totalIssues: issues.length + security.length,
+                critical: security.filter(s => s.severity === 'critical').length,
+                high: [...issues, ...security].filter(s => s.severity === 'high').length,
+                medium: [...issues, ...security, ...performance].filter(s => s.severity === 'medium').length,
+                low: issues.filter(s => s.severity === 'low').length,
+                suggestions: suggestions.length
+            };
+
+            return { issues, suggestions, security, performance, stats };
+        }
+
+        function findLineNumber(code, searchTerm) {
+            const lines = code.split('\n');
+            for (let i = 0; i < lines.length; i++) {
+                if (lines[i].includes(searchTerm)) {
+                    return i + 1;
+                }
+            }
+            return 1;
+        }
+
+        function extractCodeSnippet(code, searchTerm) {
+            const lines = code.split('\n');
+            for (let i = 0; i < lines.length; i++) {
+                if (lines[i].includes(searchTerm)) {
+                    const start = Math.max(0, i - 2);
+                    const end = Math.min(lines.length, i + 3);
+                    return lines.slice(start, end).map((line, idx) => 
+                        `${start + idx + 1}: ${line}`
+                    ).join('\n');
+                }
+            }
+            return code.split('\n').slice(0, 5).map((line, idx) => `${idx + 1}: ${line}`).join('\n');
+        }
+
+        function updateStats(stats) {
+            const statsGrid = document.getElementById('stats-grid');
+            statsGrid.innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-number">${stats.totalIssues}</div>
+                    <div class="stat-label">Total Issues</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" style="color: #dc2626;">${stats.critical}</div>
+                    <div class="stat-label">Critical</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" style="color: #ea580c;">${stats.high}</div>
+                    <div class="stat-label">High Priority</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" style="color: #16a34a;">${stats.suggestions}</div>
+                    <div class="stat-label">Suggestions</div>
+                </div>
+            `;
+        }
+
+        function generateIssuesContent(issues) {
+            const content = document.getElementById('issues-content');
+            if (issues.length === 0) {
+                content.innerHTML = '<p>No general issues found in the code.</p>';
+                return;
+            }
+
+            content.innerHTML = issues.map(issue => `
+                <div class="issue-card severity-${issue.severity}">
+                    <div class="issue-header">
+                        <span class="severity-badge badge-${issue.severity}">${issue.severity}</span>
+                        <span class="issue-title">${issue.title}</span>
+                    </div>
+                    <div class="issue-description">${issue.description}</div>
+                    <div class="code-snippet">${issue.code}</div>
+                    <div class="suggestion">
+                        <div class="suggestion-title">💡 Suggested Fix:</div>
+                        <div>${issue.suggestion}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function generateSuggestionsContent(suggestions) {
+            const content = document.getElementById('suggestions-content');
+            if (suggestions.length === 0) {
+                content.innerHTML = '<p>No additional suggestions at this time.</p>';
+                return;
+            }
+
+            content.innerHTML = suggestions.map(suggestion => `
+                <div class="issue-card">
+                    <div class="issue-header">
+                        <span class="severity-badge badge-info">${suggestion.priority}</span>
+                        <span class="issue-title">${suggestion.title}</span>
+                    </div>
+                    <div class="issue-description">${suggestion.description}</div>
+                </div>
+            `).join('');
+        }
+
+        function generateSecurityContent(securityIssues) {
+            const content = document.getElementById('security-content');
+            if (securityIssues.length === 0) {
+                content.innerHTML = '<p>✅ No security issues detected in the code changes.</p>';
+                return;
+            }
+
+            content.innerHTML = securityIssues.map(issue => `
+                <div class="issue-card severity-${issue.severity}">
+                    <div class="issue-header">
+                        <span class="severity-badge badge-${issue.severity}">${issue.severity}</span>
+                        <span class="issue-title">🔒 ${issue.title}</span>
+                    </div>
+                    <div class="issue-description">${issue.description}</div>
+                    <div class="code-snippet">${issue.code}</div>
+                    <div class="suggestion">
+                        <div class="suggestion-title">🛡️ Security Fix:</div>
+                        <div>${issue.suggestion}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function generatePerformanceContent(performanceIssues) {
+            const content = document.getElementById('performance-content');
+            if (performanceIssues.length === 0) {
+                content.innerHTML = '<p>⚡ No performance issues detected in the code changes.</p>';
+                return;
+            }
+
+            content.innerHTML = performanceIssues.map(issue => `
+                <div class="issue-card severity-${issue.severity}">
+                    <div class="issue-header">
+                        <span class="severity-badge badge-${issue.severity}">${issue.severity}</span>
+                        <span class="issue-title">⚡ ${issue.title}</span>
+                    </div>
+                    <div class="issue-description">${issue.description}</div>
+                    <div class="code-snippet">${issue.code}</div>
+                    <div class="suggestion">
+                        <div class="suggestion-title">🚀 Performance Optimization:</div>
+                        <div>${issue.suggestion}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Add sample data for demo
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('commit-message').value = 'Fix authentication vulnerability in user login';
+            document.getElementById('pr-description').value = 'Updated the authentication logic to use proper password hashing instead of plain text comparison.';
+            document.getElementById('code-changes').value = `@@ -15,7 +15,9 @@ class UserAuth {
+ 
+     authenticate(username, password) {
+-        return username === 'admin' && password === 'password123';
++        const hashedPassword = this.hashPassword(password);
++        const storedHash = this.getUserHash(username);
++        return username === 'admin' && hashedPassword === storedHash;
+     }
+ 
++    hashPassword(password) {
++        // Using bcrypt for secure password hashing
++        return bcrypt.hashSync(password, 10);
++    }
++
+     validateSession(token) {
+         console.log('Validating token:', token);
+         return jwt.verify(token, this.secretKey);
+     }`;
+        });
+    </script>
+</body>
+</html>
