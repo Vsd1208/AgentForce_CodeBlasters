@@ -436,8 +436,39 @@ Example:
                 document.querySelectorAll('.platform-btn').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
                 currentPlatform = btn.dataset.platform;
+                updatePlatformUI();
             });
         });
+
+        function updatePlatformUI() {
+            const commitLabel = document.querySelector('label[for="commit-message"]');
+            const descriptionLabel = document.querySelector('label[for="pr-description"]');
+            const codeLabel = document.querySelector('label[for="code-changes"]');
+            
+            switch(currentPlatform) {
+                case 'github':
+                    commitLabel.textContent = 'PR Title / Commit Message';
+                    descriptionLabel.textContent = 'PR Description (Optional)';
+                    codeLabel.textContent = 'Code Changes (GitHub Diff Format)';
+                    document.getElementById('commit-message').placeholder = 'e.g., Fix authentication bug in user login flow';
+                    document.getElementById('pr-description').placeholder = 'Detailed description of changes made...';
+                    break;
+                case 'gitlab':
+                    commitLabel.textContent = 'Merge Request Title';
+                    descriptionLabel.textContent = 'MR Description (Optional)';
+                    codeLabel.textContent = 'Code Changes (GitLab Diff Format)';
+                    document.getElementById('commit-message').placeholder = 'e.g., Resolve authentication vulnerability in login module';
+                    document.getElementById('pr-description').placeholder = 'Merge request description and rationale...';
+                    break;
+                case 'cli':
+                    commitLabel.textContent = 'Commit Message';
+                    descriptionLabel.textContent = 'Change Description (Optional)';
+                    codeLabel.textContent = 'Code Changes (Git Diff Format)';
+                    document.getElementById('commit-message').placeholder = 'e.g., fix: resolve auth vulnerability in login system';
+                    document.getElementById('pr-description').placeholder = 'Additional context for the changes...';
+                    break;
+            }
+        }
 
         function switchTab(tabName) {
             // Update tab buttons
@@ -497,74 +528,70 @@ Example:
         }
 
         function analyzeCode(commitMessage, codeChanges, language, description) {
-            // Intelligent code analysis logic
+            // Language-specific and platform-specific analysis
             const issues = [];
             const suggestions = [];
             const security = [];
             const performance = [];
 
-            // Analyze patterns in the code
-            if (codeChanges.includes('password') && codeChanges.includes('===')) {
-                security.push({
-                    severity: 'critical',
-                    title: 'Hardcoded Password Comparison',
-                    description: 'Direct password comparison without hashing detected. This is a critical security vulnerability.',
-                    line: findLineNumber(codeChanges, 'password'),
-                    suggestion: 'Use proper password hashing (bcrypt, scrypt, or Argon2) and compare hashed values.',
-                    code: extractCodeSnippet(codeChanges, 'password')
-                });
-            }
+            // Language-specific patterns and analysis
+            const languagePatterns = getLanguagePatterns(language);
+            const platformSpecificChecks = getPlatformChecks(currentPlatform);
 
-            if (codeChanges.includes('SQL') || codeChanges.includes('SELECT') || codeChanges.includes('INSERT')) {
-                security.push({
-                    severity: 'high',
-                    title: 'Potential SQL Injection',
-                    description: 'Raw SQL queries detected. Ensure proper parameterization to prevent SQL injection.',
-                    line: findLineNumber(codeChanges, 'SELECT'),
-                    suggestion: 'Use parameterized queries or ORM methods instead of string concatenation.',
-                    code: extractCodeSnippet(codeChanges, 'SELECT')
-                });
-            }
+            // Security Analysis - Language Specific
+            languagePatterns.security.forEach(pattern => {
+                if (new RegExp(pattern.regex, 'gi').test(codeChanges)) {
+                    security.push({
+                        severity: pattern.severity,
+                        title: pattern.title,
+                        description: pattern.description,
+                        line: findLineNumber(codeChanges, pattern.searchTerm),
+                        suggestion: pattern.suggestion,
+                        code: extractCodeSnippet(codeChanges, pattern.searchTerm)
+                    });
+                }
+            });
 
-            if (codeChanges.includes('for') && codeChanges.includes('length')) {
-                performance.push({
-                    severity: 'medium',
-                    title: 'Loop Performance Optimization',
-                    description: 'Loop accessing .length property multiple times can be optimized.',
-                    line: findLineNumber(codeChanges, 'for'),
-                    suggestion: 'Cache the length value before the loop to avoid repeated property access.',
-                    code: extractCodeSnippet(codeChanges, 'for')
-                });
-            }
+            // Performance Analysis - Language Specific
+            languagePatterns.performance.forEach(pattern => {
+                if (new RegExp(pattern.regex, 'gi').test(codeChanges)) {
+                    performance.push({
+                        severity: pattern.severity,
+                        title: pattern.title,
+                        description: pattern.description,
+                        line: findLineNumber(codeChanges, pattern.searchTerm),
+                        suggestion: pattern.suggestion,
+                        code: extractCodeSnippet(codeChanges, pattern.searchTerm)
+                    });
+                }
+            });
 
-            if (codeChanges.includes('console.log')) {
-                issues.push({
-                    severity: 'low',
-                    title: 'Debug Code Left in Production',
-                    description: 'Console.log statements found in the code.',
-                    line: findLineNumber(codeChanges, 'console.log'),
-                    suggestion: 'Remove console.log statements or replace with proper logging framework.',
-                    code: extractCodeSnippet(codeChanges, 'console.log')
-                });
-            }
+            // General Issues - Language Specific
+            languagePatterns.general.forEach(pattern => {
+                if (new RegExp(pattern.regex, 'gi').test(codeChanges)) {
+                    issues.push({
+                        severity: pattern.severity,
+                        title: pattern.title,
+                        description: pattern.description,
+                        line: findLineNumber(codeChanges, pattern.searchTerm),
+                        suggestion: pattern.suggestion,
+                        code: extractCodeSnippet(codeChanges, pattern.searchTerm)
+                    });
+                }
+            });
 
-            // Check for missing error handling
-            if (codeChanges.includes('async') && !codeChanges.includes('try') && !codeChanges.includes('catch')) {
-                issues.push({
-                    severity: 'high',
-                    title: 'Missing Error Handling',
-                    description: 'Async function without proper error handling detected.',
-                    line: findLineNumber(codeChanges, 'async'),
-                    suggestion: 'Add try-catch blocks to handle potential async errors.',
-                    code: extractCodeSnippet(codeChanges, 'async')
-                });
-            }
+            // Platform-specific suggestions
+            platformSpecificChecks.forEach(check => {
+                if (check.condition(commitMessage, description, codeChanges)) {
+                    suggestions.push(check.suggestion);
+                }
+            });
 
-            // Generate suggestions based on commit message
+            // Language-specific suggestions based on commit message
             if (commitMessage.toLowerCase().includes('fix') || commitMessage.toLowerCase().includes('bug')) {
                 suggestions.push({
-                    title: 'Add Unit Tests',
-                    description: 'Since this is a bug fix, consider adding unit tests to prevent regression.',
+                    title: `Add ${getTestFramework(language)} Tests`,
+                    description: `Since this is a bug fix, consider adding ${getTestFramework(language)} unit tests to prevent regression.`,
                     priority: 'high'
                 });
             }
@@ -572,7 +599,16 @@ Example:
             if (commitMessage.toLowerCase().includes('performance')) {
                 suggestions.push({
                     title: 'Add Performance Benchmarks',
-                    description: 'Consider adding benchmark tests to measure performance improvements.',
+                    description: `Consider adding ${getBenchmarkTool(language)} benchmark tests to measure performance improvements.`,
+                    priority: 'medium'
+                });
+            }
+
+            // Check for missing documentation
+            if (language !== 'javascript' && !codeChanges.includes('/**') && !codeChanges.includes('///') && !codeChanges.includes('#')) {
+                suggestions.push({
+                    title: 'Add Documentation',
+                    description: `Consider adding ${getDocStyle(language)} documentation for new functions and classes.`,
                     priority: 'medium'
                 });
             }
@@ -587,6 +623,309 @@ Example:
             };
 
             return { issues, suggestions, security, performance, stats };
+        }
+
+        function getLanguagePatterns(language) {
+            const patterns = {
+                javascript: {
+                    security: [
+                        {
+                            regex: 'eval\\s*\\(',
+                            searchTerm: 'eval',
+                            severity: 'critical',
+                            title: 'Dangerous eval() Usage',
+                            description: 'Using eval() can lead to code injection vulnerabilities.',
+                            suggestion: 'Use JSON.parse() for data parsing or refactor to avoid eval().'
+                        },
+                        {
+                            regex: 'innerHTML\\s*=.*\\+',
+                            searchTerm: 'innerHTML',
+                            severity: 'high',
+                            title: 'XSS Vulnerability - innerHTML',
+                            description: 'Direct innerHTML assignment with concatenation can lead to XSS attacks.',
+                            suggestion: 'Use textContent or properly sanitize HTML content.'
+                        },
+                        {
+                            regex: 'document\\.cookie',
+                            searchTerm: 'document.cookie',
+                            severity: 'medium',
+                            title: 'Insecure Cookie Handling',
+                            description: 'Direct cookie manipulation detected.',
+                            suggestion: 'Use secure cookie libraries and set httpOnly, secure flags.'
+                        }
+                    ],
+                    performance: [
+                        {
+                            regex: 'for\\s*\\(.*\\.length',
+                            searchTerm: 'for',
+                            severity: 'medium',
+                            title: 'Loop Performance Issue',
+                            description: 'Accessing .length property in loop condition can be optimized.',
+                            suggestion: 'Cache the length value before the loop: const len = arr.length;'
+                        },
+                        {
+                            regex: 'getElementById.*loop|for.*getElementById',
+                            searchTerm: 'getElementById',
+                            severity: 'medium',
+                            title: 'DOM Query in Loop',
+                            description: 'DOM queries inside loops are expensive.',
+                            suggestion: 'Cache DOM elements outside the loop.'
+                        }
+                    ],
+                    general: [
+                        {
+                            regex: 'console\\.(log|warn|error)',
+                            searchTerm: 'console.',
+                            severity: 'low',
+                            title: 'Debug Code Left in Production',
+                            description: 'Console statements found in the code.',
+                            suggestion: 'Remove console statements or use a proper logging framework.'
+                        },
+                        {
+                            regex: 'var\\s+',
+                            searchTerm: 'var ',
+                            severity: 'low',
+                            title: 'Use Modern Variable Declaration',
+                            description: 'Using var instead of let/const.',
+                            suggestion: 'Use let or const for better scope control and immutability.'
+                        }
+                    ]
+                },
+                python: {
+                    security: [
+                        {
+                            regex: 'exec\\s*\\(',
+                            searchTerm: 'exec',
+                            severity: 'critical',
+                            title: 'Dangerous exec() Usage',
+                            description: 'Using exec() can lead to code injection vulnerabilities.',
+                            suggestion: 'Avoid exec() or use safer alternatives like ast.literal_eval().'
+                        },
+                        {
+                            regex: 'input\\(.*\\).*exec|eval',
+                            searchTerm: 'input',
+                            severity: 'critical',
+                            title: 'Code Injection via Input',
+                            description: 'User input being executed as code.',
+                            suggestion: 'Never execute user input directly. Validate and sanitize all inputs.'
+                        },
+                        {
+                            regex: 'pickle\\.loads?\\(',
+                            searchTerm: 'pickle',
+                            severity: 'high',
+                            title: 'Unsafe Deserialization',
+                            description: 'Pickle deserialization can execute arbitrary code.',
+                            suggestion: 'Use JSON for data serialization or validate pickle sources.'
+                        }
+                    ],
+                    performance: [
+                        {
+                            regex: '\\+.*join|join.*\\+',
+                            searchTerm: 'join',
+                            severity: 'medium',
+                            title: 'Inefficient String Concatenation',
+                            description: 'String concatenation in loops is inefficient.',
+                            suggestion: 'Use join() for multiple string concatenations: "".join(strings)'
+                        },
+                        {
+                            regex: 'for.*in.*range\\(len\\(',
+                            searchTerm: 'range(len(',
+                            severity: 'low',
+                            title: 'Non-Pythonic Loop',
+                            description: 'Using range(len()) instead of direct iteration.',
+                            suggestion: 'Use direct iteration: for item in list: or enumerate() if index needed.'
+                        }
+                    ],
+                    general: [
+                        {
+                            regex: 'print\\s*\\(',
+                            searchTerm: 'print(',
+                            severity: 'low',
+                            title: 'Debug Print Statements',
+                            description: 'Print statements found in the code.',
+                            suggestion: 'Use logging module instead of print for production code.'
+                        },
+                        {
+                            regex: 'except\\s*:',
+                            searchTerm: 'except:',
+                            severity: 'medium',
+                            title: 'Bare Except Clause',
+                            description: 'Bare except clause catches all exceptions including system exit.',
+                            suggestion: 'Catch specific exceptions: except ValueError: or except Exception:'
+                        }
+                    ]
+                },
+                java: {
+                    security: [
+                        {
+                            regex: 'Runtime\\.getRuntime\\(\\)\\.exec',
+                            searchTerm: 'Runtime.getRuntime().exec',
+                            severity: 'critical',
+                            title: 'Command Injection Risk',
+                            description: 'Direct command execution can lead to command injection.',
+                            suggestion: 'Use ProcessBuilder with validated inputs or avoid system commands.'
+                        },
+                        {
+                            regex: 'String.*password.*=',
+                            searchTerm: 'password',
+                            severity: 'high',
+                            title: 'Password in String',
+                            description: 'Storing passwords in String objects is insecure.',
+                            suggestion: 'Use char[] for passwords and clear after use.'
+                        }
+                    ],
+                    performance: [
+                        {
+                            regex: 'String.*\\+.*loop|for.*String.*\\+',
+                            searchTerm: 'String',
+                            severity: 'medium',
+                            title: 'Inefficient String Concatenation',
+                            description: 'String concatenation in loops creates many objects.',
+                            suggestion: 'Use StringBuilder for multiple string concatenations.'
+                        },
+                        {
+                            regex: 'new.*ArrayList\\(\\).*for',
+                            searchTerm: 'new ArrayList()',
+                            severity: 'low',
+                            title: 'ArrayList Size Optimization',
+                            description: 'ArrayList without initial capacity may resize multiple times.',
+                            suggestion: 'Specify initial capacity if size is known: new ArrayList<>(expectedSize)'
+                        }
+                    ],
+                    general: [
+                        {
+                            regex: 'System\\.out\\.print',
+                            searchTerm: 'System.out.print',
+                            severity: 'low',
+                            title: 'Debug Print Statements',
+                            description: 'System.out.print statements found in code.',
+                            suggestion: 'Use proper logging framework like SLF4J or java.util.logging.'
+                        },
+                        {
+                            regex: 'catch\\s*\\(\\s*Exception',
+                            searchTerm: 'catch (Exception',
+                            severity: 'medium',
+                            title: 'Catching Generic Exception',
+                            description: 'Catching generic Exception hides specific error handling.',
+                            suggestion: 'Catch specific exceptions for better error handling.'
+                        }
+                    ]
+                }
+            };
+
+            // Return JavaScript patterns as default for other languages
+            return patterns[language] || patterns.javascript;
+        }
+
+        function getPlatformChecks(platform) {
+            const checks = {
+                github: [
+                    {
+                        condition: (commit, desc, code) => commit.startsWith('fix:') || commit.startsWith('feat:'),
+                        suggestion: {
+                            title: 'Conventional Commits Detected',
+                            description: 'Great! You\'re using conventional commit format. Consider adding breaking change info if applicable.',
+                            priority: 'info'
+                        }
+                    },
+                    {
+                        condition: (commit, desc, code) => desc.length < 50 && code.split('\n').length > 20,
+                        suggestion: {
+                            title: 'Add Detailed PR Description',
+                            description: 'Large code changes should have detailed PR descriptions for better review.',
+                            priority: 'medium'
+                        }
+                    },
+                    {
+                        condition: (commit, desc, code) => !desc.includes('closes') && !desc.includes('fixes'),
+                        suggestion: {
+                            title: 'Link Related Issues',
+                            description: 'Consider linking related GitHub issues using "fixes #123" or "closes #123".',
+                            priority: 'low'
+                        }
+                    }
+                ],
+                gitlab: [
+                    {
+                        condition: (commit, desc, code) => !desc.includes('See merge request'),
+                        suggestion: {
+                            title: 'GitLab MR Best Practices',
+                            description: 'Consider adding related issue links and milestone information.',
+                            priority: 'low'
+                        }
+                    },
+                    {
+                        condition: (commit, desc, code) => code.includes('TODO') || code.includes('FIXME'),
+                        suggestion: {
+                            title: 'Create GitLab Issues for TODOs',
+                            description: 'Convert TODO/FIXME comments into GitLab issues for better tracking.',
+                            priority: 'medium'
+                        }
+                    }
+                ],
+                cli: [
+                    {
+                        condition: (commit, desc, code) => !commit.includes(':'),
+                        suggestion: {
+                            title: 'Use Conventional Commits',
+                            description: 'Consider using conventional commit format: type(scope): description',
+                            priority: 'low'
+                        }
+                    },
+                    {
+                        condition: (commit, desc, code) => code.split('\n').length > 50,
+                        suggestion: {
+                            title: 'Consider Breaking Down Changes',
+                            description: 'Large commits are harder to review. Consider breaking into smaller, focused commits.',
+                            priority: 'medium'
+                        }
+                    }
+                ]
+            };
+
+            return checks[platform] || checks.github;
+        }
+
+        function getTestFramework(language) {
+            const frameworks = {
+                javascript: 'Jest/Mocha',
+                python: 'pytest/unittest',
+                java: 'JUnit',
+                csharp: 'NUnit/xUnit',
+                go: 'testing package',
+                rust: 'built-in test',
+                php: 'PHPUnit',
+                ruby: 'RSpec/Minitest'
+            };
+            return frameworks[language] || 'unit testing framework';
+        }
+
+        function getBenchmarkTool(language) {
+            const tools = {
+                javascript: 'Benchmark.js',
+                python: 'timeit/pytest-benchmark',
+                java: 'JMH (Java Microbenchmark Harness)',
+                csharp: 'BenchmarkDotNet',
+                go: 'testing.B',
+                rust: 'criterion',
+                php: 'PHPBench',
+                ruby: 'benchmark-ips'
+            };
+            return tools[language] || 'benchmarking tools';
+        }
+
+        function getDocStyle(language) {
+            const styles = {
+                javascript: 'JSDoc',
+                python: 'docstring',
+                java: 'Javadoc',
+                csharp: 'XML documentation',
+                go: 'Go doc comments',
+                rust: 'rustdoc',
+                php: 'PHPDoc',
+                ruby: 'YARD'
+            };
+            return styles[language] || 'inline';
         }
 
         function findLineNumber(code, searchTerm) {
@@ -724,27 +1063,152 @@ Example:
 
         // Add sample data for demo
         document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('commit-message').value = 'Fix authentication vulnerability in user login';
-            document.getElementById('pr-description').value = 'Updated the authentication logic to use proper password hashing instead of plain text comparison.';
-            document.getElementById('code-changes').value = `@@ -15,7 +15,9 @@ class UserAuth {
+            // Initialize platform UI
+            updatePlatformUI();
+            
+            // Set sample data based on selected language
+            updateSampleData();
+            
+            // Add language change listener
+            document.getElementById('file-language').addEventListener('change', updateSampleData);
+        });
+
+        function updateSampleData() {
+            const language = document.getElementById('file-language').value;
+            const sampleData = getSampleData(language);
+            
+            document.getElementById('commit-message').value = sampleData.commit;
+            document.getElementById('pr-description').value = sampleData.description;
+            document.getElementById('code-changes').value = sampleData.code;
+        }
+
+        function getSampleData(language) {
+            const samples = {
+                javascript: {
+                    commit: 'fix: resolve XSS vulnerability in user input handling',
+                    description: 'Updated the user input processing to prevent XSS attacks by sanitizing HTML content and using textContent instead of innerHTML.',
+                    code: `@@ -15,7 +15,9 @@ class UserInput {
  
-     authenticate(username, password) {
--        return username === 'admin' && password === 'password123';
-+        const hashedPassword = this.hashPassword(password);
-+        const storedHash = this.getUserHash(username);
-+        return username === 'admin' && hashedPassword === storedHash;
+     processUserComment(comment) {
+-        document.getElementById('comments').innerHTML += '<div>' + comment + '</div>';
++        const commentDiv = document.createElement('div');
++        commentDiv.textContent = comment; // Safe from XSS
++        document.getElementById('comments').appendChild(commentDiv);
      }
  
-+    hashPassword(password) {
-+        // Using bcrypt for secure password hashing
-+        return bcrypt.hashSync(password, 10);
+     validateInput(input) {
+-        return eval('(' + input + ')'); // Dangerous!
++        try {
++            return JSON.parse(input); // Safe parsing
++        } catch(e) {
++            console.log('Invalid input:', e);
++            return null;
++        }
+     }`
+                },
+                python: {
+                    commit: 'fix: resolve pickle deserialization vulnerability',
+                    description: 'Replaced unsafe pickle.loads() with JSON parsing to prevent arbitrary code execution.',
+                    code: `@@ -10,8 +10,12 @@ class DataProcessor:
+     
+     def load_user_data(self, data_string):
+-        return pickle.loads(data_string)  # Unsafe!
++        try:
++            return json.loads(data_string)  # Safe parsing
++        except json.JSONDecodeError:
++            print("Invalid JSON data")
++            return None
+ 
+     def process_items(self, items):
+-        for i in range(len(items)):  # Non-pythonic
+-            print(items[i])
++        for item in items:  # Pythonic way
++            print(item)`
+                },
+                java: {
+                    commit: 'perf: optimize string concatenation in loop',
+                    description: 'Replaced String concatenation with StringBuilder for better performance in data processing loop.',
+                    code: `@@ -20,10 +20,12 @@ public class DataProcessor {
+ 
+     public String processData(List<String> items) {
+-        String result = "";
++        StringBuilder result = new StringBuilder();
+         for (String item : items) {
+-            result += item + ", ";  // Inefficient
++            result.append(item).append(", ");  // Efficient
+         }
+-        System.out.println("Result: " + result);  // Debug code
+-        return result;
++        String finalResult = result.toString();
++        logger.info("Processed {} items", items.size());
++        return finalResult;
+     }
+ }`
+                },
+                python: {
+                    commit: 'security: fix SQL injection in user query',
+                    description: 'Implemented parameterized queries to prevent SQL injection attacks in user search functionality.',
+                    code: `@@ -25,8 +25,10 @@ class UserRepository:
+ 
+     def find_user(self, username):
+-        query = f"SELECT * FROM users WHERE username = '{username}'"  # SQL Injection!
+-        return self.db.execute(query)
++        query = "SELECT * FROM users WHERE username = %s"  # Safe parameterized query
++        return self.db.execute(query, (username,))
+ 
+     def get_all_users(self):
+-        except:  # Bare except is bad
++        except DatabaseError as e:  # Specific exception
++            print(f"Database error: {e}")
+             return []`
+                },
+                csharp: {
+                    commit: 'fix: resolve memory leak in event handlers',
+                    description: 'Added proper event handler cleanup to prevent memory leaks when disposing objects.',
+                    code: `@@ -15,6 +15,8 @@ public class EventManager : IDisposable
+ 
+     public void Subscribe(INotifyPropertyChanged obj) {
+         obj.PropertyChanged += OnPropertyChanged;
++        // Store reference for cleanup
++        _subscriptions.Add(obj);
+     }
+ 
+     public void Dispose() {
+-        // Missing cleanup
++        foreach(var obj in _subscriptions) {
++            obj.PropertyChanged -= OnPropertyChanged;
++        }
++        _subscriptions.Clear();
+     }`
+                },
+                go: {
+                    commit: 'fix: add proper error handling to HTTP client',
+                    description: 'Added comprehensive error handling for HTTP requests to prevent silent failures.',
+                    code: `@@ -10,7 +10,15 @@ func fetchUserData(url string) (*User, error) {
+ 
+     resp, err := http.Get(url)
+-    defer resp.Body.Close()  // Potential nil pointer
++    if err != nil {
++        return nil, fmt.Errorf("failed to fetch user data: %w", err)
 +    }
-+
-     validateSession(token) {
-         console.log('Validating token:', token);
-         return jwt.verify(token, this.secretKey);
-     }`;
-        });
++    defer resp.Body.Close()
++    
++    if resp.StatusCode != http.StatusOK {
++        return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
++    }
+ 
+     var user User
+-    json.NewDecoder(resp.Body).Decode(&user)  // No error handling
++    if err := json.NewDecoder(resp.Body).Decode(&user); err != nil {
++        return nil, fmt.Errorf("failed to decode response: %w", err)
++    }
+     return &user, nil
+ }`
+                }
+            };
+
+            return samples[language] || samples.javascript;
+        }
     </script>
 </body>
 </html>
