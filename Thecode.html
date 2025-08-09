@@ -6,20 +6,20 @@
     <title>AI PR Reviewer</title>
     <style>
         :root { 
-            --primary-color: #2563eb;
+            --primary-color: rgb(106, 8, 162);;
             --primary-dark: #1d4ed8;
             --secondary-color: #64748b;
             --success-color: #10b981;
             --warning-color: #f59e0b;
             --error-color: #ef4444;
             --critical-color: #dc2626;
-            --background: #f8fafc;
-            --surface: #ffffff;
+            --background: #ffe7fc;
+            --surface: #d0449d;
             --text-primary: #1e293b;
             --text-secondary: #64748b;
-            --border: #e2e8f0;
+            --border: #911ebe;
             --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-                    }
+        }
 
         * {
             margin: 0;
@@ -62,7 +62,7 @@
             border-radius: 12px;
             padding: 2rem;
             box-shadow: var(--shadow);
-            border: 1px solid var(--border);
+            border: 5px solid var(--border);
         }
 
         .platform-tabs {
@@ -83,11 +83,22 @@
             cursor: pointer;
             font-weight: 500;
             transition: all 0.2s;
+            color: var(--text-primary);
+            position: relative;
+        }
+
+        .platform-tab:focus {
+            outline: 2px solid var(--primary-color);
+            outline-offset: 2px;
         }
 
         .platform-tab.active {
             background: var(--primary-color);
             color: white;
+        }
+        .platform-tab:hover:not(.active) {
+            background: rgb(106, 8, 162);
+            color:white
         }
 
         .demo-section {
@@ -115,11 +126,22 @@
             font-size: 0.9rem;
             text-align: left;
             transition: all 0.2s;
+            color: var(--text-primary);
         }
 
         .demo-btn:hover {
             border-color: var(--primary-color);
             background: white;
+            transform: translateY(-1px);
+        }
+
+        .demo-btn:focus {
+            outline: 2px solid var(--primary-color);
+            outline-offset: 2px;
+        }
+
+        .demo-btn:active {
+            transform: translateY(0);
         }
 
         .form-grid {
@@ -151,6 +173,7 @@
             border-radius: 8px;
             font-size: 0.9rem;
             transition: border-color 0.2s;
+            background: white;
         }
 
         .form-input:focus, .form-textarea:focus, .form-select:focus {
@@ -162,7 +185,7 @@
         .form-textarea {
             min-height: 120px;
             resize: vertical;
-            font-family: 'Monaco', 'Menlo', monospace;
+            font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
         }
 
         .code-textarea {
@@ -177,21 +200,34 @@
             border-radius: 8px;
             font-weight: 600;
             cursor: pointer;
-            transition: background-color 0.2s;
+            transition: all 0.2s;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 0.5rem;
             margin: 0 auto;
+            font-size: 1rem;
         }
 
         .analyze-btn:hover:not(:disabled) {
             background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow);
+        }
+
+        .analyze-btn:focus {
+            outline: 2px solid var(--primary-color);
+            outline-offset: 2px;
+        }
+
+        .analyze-btn:active:not(:disabled) {
+            transform: translateY(0);
         }
 
         .analyze-btn:disabled {
             opacity: 0.6;
             cursor: not-allowed;
+            transform: none;
         }
 
         .spinner {
@@ -280,6 +316,12 @@
             border-radius: 12px;
             padding: 1.5rem;
             border-left: 4px solid;
+            transition: transform 0.2s;
+        }
+
+        .issue-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
         }
 
         .issue-card.critical { border-left-color: var(--critical-color); }
@@ -318,10 +360,11 @@
             border: 1px solid var(--border);
             border-radius: 8px;
             padding: 1rem;
-            font-family: 'Monaco', 'Menlo', monospace;
+            font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
             font-size: 0.85rem;
             margin: 1rem 0;
             overflow-x: auto;
+            position: relative;
         }
 
         .suggestion {
@@ -346,6 +389,32 @@
         .no-issues-icon {
             font-size: 3rem;
             margin-bottom: 1rem;
+        }
+
+        .platform-content {
+            display: none;
+        }
+
+        .platform-content.active {
+            display: block;
+        }
+
+        .platform-info {
+            background: var(--background);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .error-message {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: var(--critical-color);
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            display: none;
         }
 
         @media (max-width: 768px) {
@@ -373,6 +442,79 @@
                 text-align: center;
             }
         }
+
+        .api-config {
+            background: var(--background);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            border: 1px solid var(--border);
+        }
+
+        .api-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+        }
+
+        .api-status.success {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success-color);
+        }
+
+        .api-status.error {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--error-color);
+        }
+
+        .api-status.info {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--primary-color);
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .loading-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            text-align: center;
+            min-width: 300px;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--border);
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        .rate-limit-info {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+            padding: 0.5rem;
+            background: rgba(59, 130, 246, 0.05);
+            border-radius: 4px;
+        }
     </style>
 </head>
 <body>
@@ -384,45 +526,213 @@
 
         <div class="main-card">
             <!-- Platform Selection -->
-            <div class="platform-tabs">
-                <button class="platform-tab active" data-platform="github">GitHub</button>
-                <button class="platform-tab" data-platform="gitlab">GitLab</button>
-                <button class="platform-tab" data-platform="cli">CLI Tool</button>
+            <div class="platform-tabs" role="tablist" aria-label="Select platform">
+                <button 
+                    class="platform-tab active" 
+                    data-platform="github" 
+                    role="tab" 
+                    aria-selected="true"
+                    aria-controls="github-panel"
+                    id="github-tab"
+                >
+                    GitHub
+                </button>
+                <button 
+                    class="platform-tab" 
+                    data-platform="gitlab" 
+                    role="tab" 
+                    aria-selected="false"
+                    aria-controls="gitlab-panel"
+                    id="gitlab-tab"
+                >
+                    GitLab
+                </button>
+                <button 
+                    class="platform-tab" 
+                    data-platform="cli" 
+                    role="tab" 
+                    aria-selected="false"
+                    aria-controls="cli-panel"
+                    id="cli-tab"
+                >
+                    CLI Tool
+                </button>
+            </div>
+
+            <!-- Platform-specific content -->
+            <div id="github-panel" class="platform-content active" role="tabpanel" aria-labelledby="github-tab">
+                <div class="platform-info">
+                    <strong>GitHub Integration:</strong> Analyze pull requests directly from GitHub repositories with webhooks and API integration.
+                </div>
+                <div class="api-config">
+                    <div class="form-group">
+                        <label class="form-label" for="github-token">GitHub Personal Access Token (Optional)</label>
+                        <input 
+                            type="password" 
+                            id="github-token" 
+                            class="form-input" 
+                            placeholder="ghp_xxxxxxxxxxxxxxxxxxxx"
+                            value=""
+                        >
+                        <small style="color: var(--text-secondary); font-size: 0.85rem;">
+                            For accessing private repositories and higher rate limits
+                        </small>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="github-repo">Repository (Optional)</label>
+                        <input 
+                            type="text" 
+                            id="github-repo" 
+                            class="form-input" 
+                            placeholder="owner/repository-name"
+                        >
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="github-pr">Pull Request Number (Optional)</label>
+                        <input 
+                            type="number" 
+                            id="github-pr" 
+                            class="form-input" 
+                            placeholder="123"
+                        >
+                    </div>
+                    <button class="demo-btn" onclick="fetchGitHubPR()" style="margin-top: 0.5rem;">
+                        📥 Fetch PR from GitHub
+                    </button>
+                </div>
+            </div>
+
+            <div id="gitlab-panel" class="platform-content" role="tabpanel" aria-labelledby="gitlab-tab">
+                <div class="platform-info">
+                    <strong>GitLab Integration:</strong> Connect with GitLab merge requests using GitLab CI/CD pipelines and API endpoints.
+                </div>
+                <div class="api-config">
+                    <div class="form-group">
+                        <label class="form-label" for="gitlab-token">GitLab Access Token (Optional)</label>
+                        <input 
+                            type="password" 
+                            id="gitlab-token" 
+                            class="form-input" 
+                            placeholder="glpat-xxxxxxxxxxxxxxxxxxxx"
+                        >
+                        <small style="color: var(--text-secondary); font-size: 0.85rem;">
+                            For accessing private projects and API features
+                        </small>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="gitlab-project">Project ID (Optional)</label>
+                        <input 
+                            type="text" 
+                            id="gitlab-project" 
+                            class="form-input" 
+                            placeholder="12345 or owner/project-name"
+                        >
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="gitlab-mr">Merge Request IID (Optional)</label>
+                        <input 
+                            type="number" 
+                            id="gitlab-mr" 
+                            class="form-input" 
+                            placeholder="42"
+                        >
+                    </div>
+                    <button class="demo-btn" onclick="fetchGitLabMR()" style="margin-top: 0.5rem;">
+                        📥 Fetch MR from GitLab
+                    </button>
+                </div>
+            </div>
+
+            <div id="cli-panel" class="platform-content" role="tabpanel" aria-labelledby="cli-tab">
+                <div class="platform-info">
+                    <strong>CLI Tool:</strong> Use the command-line interface for local development and CI/CD integration.
+                    <br><br>
+                    <code>npm install -g ai-pr-reviewer</code><br>
+                    <code>ai-pr-review --file changes.diff --format json</code>
+                </div>
+                <div class="api-config">
+                    <div class="form-group">
+                        <label class="form-label" for="ai-provider">AI Analysis Provider</label>
+                        <select id="ai-provider" class="form-select">
+                            <option value="local">Local Analysis (Default)</option>
+                            <option value="openai">OpenAI GPT-4</option>
+                            <option value="cohere">Cohere Command</option>
+                            <option value="anthropic">Claude (Coming Soon)</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="ai-token-group" style="display: none;">
+                        <label class="form-label" for="ai-token">API Key</label>
+                        <input 
+                            type="password" 
+                            id="ai-token" 
+                            class="form-input" 
+                            placeholder="Enter your API key"
+                        >
+                        <small style="color: var(--text-secondary); font-size: 0.85rem;">
+                            Your API key is stored locally and never sent to our servers
+                        </small>
+                    </div>
+                </div>
             </div>
 
             <!-- Demo Examples -->
             <div class="demo-section">
                 <div class="demo-label">Quick Demo Examples:</div>
                 <div class="demo-grid">
-                    <button class="demo-btn" onclick="loadDemo('security')">
+                    <button 
+                        class="demo-btn" 
+                        onclick="loadDemo('security')"
+                        aria-label="Load security issues demo"
+                    >
                         🔒 Security Issues<br>
                         <small>SQL injection, weak auth</small>
                     </button>
-                    <button class="demo-btn" onclick="loadDemo('performance')">
+                    <button 
+                        class="demo-btn" 
+                        onclick="loadDemo('performance')"
+                        aria-label="Load performance issues demo"
+                    >
                         ⚡ Performance Issues<br>
                         <small>N+1 queries, inefficient loops</small>
                     </button>
-                    <button class="demo-btn" onclick="loadDemo('logic')">
+                    <button 
+                        class="demo-btn" 
+                        onclick="loadDemo('logic')"
+                        aria-label="Load logic errors demo"
+                    >
                         🧠 Logic Errors<br>
                         <small>Assignment vs comparison</small>
                     </button>
-                    <button class="demo-btn" onclick="loadDemo('clean')">
+                    <button 
+                        class="demo-btn" 
+                        onclick="loadDemo('clean')"
+                        aria-label="Load clean code demo"
+                    >
                         ✅ Clean Code<br>
                         <small>Best practices example</small>
                     </button>
                 </div>
             </div>
 
+            <!-- Error message container -->
+            <div id="error-message" class="error-message" role="alert" aria-live="polite"></div>
+
             <!-- Input Form -->
             <div class="form-grid">
                 <div class="form-row">
                     <div class="form-group">
-                        <label class="form-label">Commit Message</label>
-                        <textarea id="commitMessage" class="form-textarea" placeholder="Describe your changes (e.g., feat: Add user authentication system)"></textarea>
+                        <label class="form-label" for="commitMessage">Commit Message</label>
+                        <textarea 
+                            id="commitMessage" 
+                            class="form-textarea" 
+                            placeholder="Describe your changes (e.g., feat: Add user authentication system)"
+                            aria-describedby="commit-help"
+                        ></textarea>
+                        <small id="commit-help" class="sr-only">Enter a descriptive commit message for your changes</small>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Language</label>
-                        <select id="language" class="form-select">
+                        <label class="form-label" for="language">Programming Language</label>
+                        <select id="language" class="form-select" aria-describedby="language-help">
                             <option value="javascript">JavaScript</option>
                             <option value="typescript">TypeScript</option>
                             <option value="python">Python</option>
@@ -436,22 +746,30 @@
                             <option value="swift">Swift</option>
                             <option value="cpp">C++</option>
                         </select>
+                        <small id="language-help" class="sr-only">Select the programming language of your code</small>
                     </div>
                 </div>
                 
                 <div class="form-group">
-                    <label class="form-label">Code Changes</label>
-                    <textarea id="codeChanges" class="form-textarea code-textarea" placeholder="Paste your code diff, full code, or modified functions here..."></textarea>
+                    <label class="form-label" for="codeChanges">Code Changes</label>
+                    <textarea 
+                        id="codeChanges" 
+                        class="form-textarea code-textarea" 
+                        placeholder="Paste your code diff, full code, or modified functions here..."
+                        aria-describedby="code-help"
+                    ></textarea>
+                    <small id="code-help" class="sr-only">Paste the code you want to analyze for issues</small>
                 </div>
             </div>
 
-            <button class="analyze-btn" onclick="analyzeCode()">
-                <div class="spinner"></div>
+            <button class="analyze-btn" onclick="analyzeCode()" aria-describedby="analyze-help">
+                <div class="spinner" aria-hidden="true"></div>
                 <span>Analyze Pull Request</span>
             </button>
+            <small id="analyze-help" class="sr-only">Click to start analyzing your code for security, performance, and logic issues</small>
 
             <!-- Results -->
-            <div class="results" id="results">
+            <div class="results" id="results" role="region" aria-label="Analysis results" aria-live="polite">
                 <div class="summary-card" id="summary"></div>
                 <div class="issues-list" id="issues"></div>
             </div>
@@ -460,17 +778,202 @@
 
     <script>
         let currentPlatform = 'github';
+        let isAnalyzing = false;
 
-        // Platform tabs
-        document.querySelectorAll('.platform-tab').forEach(tab => {
-            tab.addEventListener('click', () => {
-                document.querySelector('.platform-tab.active').classList.remove('active');
-                tab.classList.add('active');
-                currentPlatform = tab.dataset.platform;
+        // API Configuration
+        const API_CONFIG = {
+            github: {
+                baseUrl: 'https://api.github.com',
+                token: localStorage.getItem('github_token') || ''
+            },
+            gitlab: {
+                baseUrl: 'https://gitlab.com/api/v4',
+                token: localStorage.getItem('gitlab_token') || ''
+            },
+            openai: {
+                baseUrl: 'https://api.openai.com/v1',
+                token: localStorage.getItem('openai_token') || ''
+            },
+            cohere: {
+                baseUrl: 'https://api.cohere.ai/v1',
+                token: localStorage.getItem('cohere_token') || ''
+            }
+        };
+
+        // Initialize the application
+        function initApp() {
+            setupEventListeners();
+            setupKeyboardNavigation();
+        }
+
+        function setupEventListeners() {
+            console.log('Setting up event listeners');
+            
+            // Platform tabs - Add both click and focus handlers
+            document.querySelectorAll('.platform-tab').forEach(tab => {
+                // Remove any existing listeners first
+                tab.removeEventListener('click', handleTabClick);
+                tab.removeEventListener('keydown', handleTabKeydown);
+                
+                // Add new listeners
+                tab.addEventListener('click', handleTabClick);
+                tab.addEventListener('keydown', handleTabKeydown);
+                
+                console.log('Added listeners for tab:', tab.dataset.platform);
             });
-        });
 
-        // Enhanced demo data with language-specific examples
+            // Demo buttons
+            document.querySelectorAll('.demo-btn').forEach(btn => {
+                btn.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        btn.click();
+                    }
+                });
+            });
+
+            // Analyze button
+            const analyzeBtn = document.querySelector('.analyze-btn');
+            if (analyzeBtn) {
+                analyzeBtn.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        if (!isAnalyzing) {
+                            analyzeCode();
+                        }
+                    }
+                });
+            }
+
+            // Save API tokens when they change
+            ['github-token', 'gitlab-token', 'ai-token'].forEach(id => {
+                const input = document.getElementById(id);
+                if (input) {
+                    input.addEventListener('change', function() {
+                        if (this.value.trim()) {
+                            const storageKey = id.replace('-', '_');
+                            sessionStorage.setItem(storageKey, this.value.trim());
+                            console.log('Saved token for:', storageKey);
+                        }
+                    });
+                }
+            });
+            
+            console.log('Event listeners setup complete');
+        }
+
+        function setupKeyboardNavigation() {
+            // Tab navigation for platform tabs
+            document.addEventListener('keydown', function(e) {
+                const focusedElement = document.activeElement;
+                
+                if (focusedElement && focusedElement.classList.contains('platform-tab')) {
+                    handleTabNavigation(e, focusedElement);
+                }
+            });
+        }
+
+        function handleTabClick(e) {
+            console.log('Tab clicked:', e.currentTarget.dataset.platform);
+            e.preventDefault();
+            e.stopPropagation();
+            const clickedTab = e.currentTarget;
+            switchTab(clickedTab);
+        }
+
+        function handleTabKeydown(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                console.log('Tab activated with keyboard:', e.currentTarget.dataset.platform);
+                e.preventDefault();
+                e.stopPropagation();
+                switchTab(e.currentTarget);
+            }
+        }
+
+        function handleTabNavigation(e, currentTab) {
+            const tabs = Array.from(document.querySelectorAll('.platform-tab'));
+            const currentIndex = tabs.indexOf(currentTab);
+            let nextIndex;
+
+            switch (e.key) {
+                case 'ArrowLeft':
+                case 'ArrowUp':
+                    e.preventDefault();
+                    nextIndex = currentIndex > 0 ? currentIndex - 1 : tabs.length - 1;
+                    break;
+                case 'ArrowRight':
+                case 'ArrowDown':
+                    e.preventDefault();
+                    nextIndex = currentIndex < tabs.length - 1 ? currentIndex + 1 : 0;
+                    break;
+                case 'Home':
+                    e.preventDefault();
+                    nextIndex = 0;
+                    break;
+                case 'End':
+                    e.preventDefault();
+                    nextIndex = tabs.length - 1;
+                    break;
+                default:
+                    return;
+            }
+
+            tabs[nextIndex].focus();
+            switchTab(tabs[nextIndex]);
+        }
+
+        function switchTab(targetTab) {
+            console.log('Switching to tab:', targetTab.dataset.platform); // Debug log
+            
+            // Update tab states
+            document.querySelectorAll('.platform-tab').forEach(tab => {
+                tab.classList.remove('active');
+                tab.setAttribute('aria-selected', 'false');
+                tab.setAttribute('tabindex', '-1');
+            });
+
+            targetTab.classList.add('active');
+            targetTab.setAttribute('aria-selected', 'true');
+            targetTab.setAttribute('tabindex', '0');
+
+            // Update current platform
+            currentPlatform = targetTab.dataset.platform;
+            console.log('Current platform set to:', currentPlatform); // Debug log
+
+            // Show/hide platform content with forced display
+            document.querySelectorAll('.platform-content').forEach(content => {
+                content.classList.remove('active');
+                content.style.display = 'none';
+            });
+
+            const targetPanel = document.getElementById(`${currentPlatform}-panel`);
+            console.log('Target panel:', targetPanel); // Debug log
+            
+            if (targetPanel) {
+                targetPanel.classList.add('active');
+                targetPanel.style.display = 'block';
+            }
+
+            // Clear any previous error messages
+            hideError();
+            
+            // Trigger any platform-specific initialization
+            initializePlatformFeatures(currentPlatform);
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('error-message');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            errorDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function hideError() {
+            const errorDiv = document.getElementById('error-message');
+            errorDiv.style.display = 'none';
+        }
+
+        // Enhanced demo data with more comprehensive examples
         const demos = {
             security: {
                 commit: "feat: Add user authentication with session management",
@@ -502,7 +1005,13 @@ const token = jwt.sign({ userId: user.id }, 'secret123');
 
 // Code injection risk
 const userCode = req.body.code;
-eval(userCode); // Never do this!`
+eval(userCode); // Never do this!
+
+// Command injection
+const filename = req.body.filename;
+exec(\`cat \${filename}\`, (error, stdout) => {
+    res.send(stdout);
+});`
             },
             performance: {
                 commit: "perf: Optimize data loading and processing",
@@ -529,18 +1038,27 @@ async function loadUserDashboard(userId) {
         html += '<div>' + data[i] + '</div>';
     }
     
+    // Object creation in loop
+    const processors = [];
+    for (let i = 0; i < items.length; i++) {
+        const processor = new DataProcessor();
+        processors.push(processor.process(items[i]));
+    }
+    
     // Inefficient timeout usage
     setTimeout(() => {
         updateCache(user);
     }, 0);
     
-    // Object creation in loop
-    for (let i = 0; i < items.length; i++) {
-        const processor = new DataProcessor();
-        results.push(processor.process(items[i]));
-    }
-    
     return user;
+}
+
+// Memory leak potential
+function createHandler() {
+    const data = new Array(1000000).fill('data');
+    return function() {
+        console.log(data[0]); // Closure keeps entire array
+    };
 }`
             },
             logic: {
@@ -560,6 +1078,7 @@ function validateUserAccess(user, resource) {
     // Missing return statement
     if (user.isPremium) {
         console.log('Premium user detected');
+        // Missing return true;
     }
     
     // Redundant boolean comparison
@@ -581,7 +1100,16 @@ function validateUserAccess(user, resource) {
 // Missing await in async function
 async function processData() {
     const data = fetchUserData(); // Missing await
-    return data.process();
+    return data.process(); // This might fail
+}
+
+// Infinite loop potential
+function findItem(items, target) {
+    let i = 0;
+    while (items[i] != target) { // Should use !== and check bounds
+        i++;
+    }
+    return i;
 }`
             },
             clean: {
@@ -591,6 +1119,9 @@ const bcrypt = require('bcrypt');
 const validator = require('validator');
 const rateLimit = require('express-rate-limit');
 
+/**
+ * User service with security best practices
+ */
 class UserService {
     constructor(database, logger) {
         this.db = database;
@@ -598,6 +1129,11 @@ class UserService {
         this.saltRounds = 12;
     }
     
+    /**
+     * Creates a new user with proper validation and security
+     * @param {Object} userData - User data object
+     * @returns {Promise<Object>} Created user object
+     */
     async createUser(userData) {
         try {
             // Input validation with specific error messages
@@ -634,7 +1170,7 @@ class UserService {
                 return user;
             });
             
-            // Proper logging
+            // Proper logging without sensitive data
             this.logger.info(\`User created successfully: \${userData.username}\`, {
                 userId: result.insertId,
                 timestamp: new Date().toISOString()
@@ -699,43 +1235,109 @@ class UserService {
         };
 
         function loadDemo(type) {
-            const demo = demos[type];
-            document.getElementById('commitMessage').value = demo.commit;
-            document.getElementById('codeChanges').value = demo.code;
+            try {
+                const demo = demos[type];
+                if (!demo) {
+                    throw new Error(`Demo type "${type}" not found`);
+                }
+                
+                document.getElementById('commitMessage').value = demo.commit;
+                document.getElementById('codeChanges').value = demo.code;
+                
+                hideError();
+                
+                // Scroll to code input for better UX
+                document.getElementById('codeChanges').scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'nearest' 
+                });
+                
+                // Focus on the code textarea
+                document.getElementById('codeChanges').focus();
+                
+            } catch (error) {
+                showError(`Failed to load demo: ${error.message}`);
+            }
         }
 
-        function analyzeCode() {
+        async function analyzeCode() {
+            if (isAnalyzing) {
+                return;
+            }
+
             const commitMessage = document.getElementById('commitMessage').value.trim();
             const codeChanges = document.getElementById('codeChanges').value.trim();
             const language = document.getElementById('language').value;
 
-            if (!commitMessage || !codeChanges) {
-                alert('Please provide both commit message and code changes');
+            // Enhanced validation
+            if (!commitMessage) {
+                showError('Please provide a commit message describing your changes');
+                document.getElementById('commitMessage').focus();
                 return;
             }
 
-            // Show loading
+            if (!codeChanges) {
+                showError('Please provide code changes to analyze');
+                document.getElementById('codeChanges').focus();
+                return;
+            }
+
+            if (commitMessage.length < 10) {
+                showError('Commit message should be more descriptive (at least 10 characters)');
+                document.getElementById('commitMessage').focus();
+                return;
+            }
+
+            if (codeChanges.length < 50) {
+                showError('Code changes seem too short. Please provide more substantial code for analysis');
+                document.getElementById('codeChanges').focus();
+                return;
+            }
+
+            hideError();
+            
+            // Show loading state
+            isAnalyzing = true;
             const btn = document.querySelector('.analyze-btn');
             const spinner = btn.querySelector('.spinner');
             const span = btn.querySelector('span');
             
             btn.disabled = true;
+            btn.setAttribute('aria-busy', 'true');
             spinner.style.display = 'block';
-            span.textContent = 'Analyzing...';
+            span.textContent = 'Analyzing code...';
 
-            // Simulate analysis
-            setTimeout(() => {
-                const analysis = performAnalysis(commitMessage, codeChanges, language);
+            // Simulate realistic analysis time based on code length
+            const analysisTime = Math.min(Math.max(1500, codeChanges.length * 2), 4000);
+
+            try {
+                let analysis;
+                
+                // Use AI analysis if configured
+                const aiProvider = document.getElementById('ai-provider');
+                if (aiProvider && aiProvider.value !== 'local') {
+                    analysis = await performAIAnalysis(codeChanges, language, commitMessage);
+                } else {
+                    // Simulate analysis time for local processing
+                    await new Promise(resolve => setTimeout(resolve, analysisTime));
+                    analysis = performAnalysis(commitMessage, codeChanges, language);
+                }
+                
                 showResults(analysis);
                 
-                // Reset button
+            } catch (error) {
+                showError(`Analysis failed: ${error.message}`);
+            } finally {
+                // Reset button state
+                isAnalyzing = false;
                 btn.disabled = false;
+                btn.setAttribute('aria-busy', 'false');
                 spinner.style.display = 'none';
                 span.textContent = 'Analyze Pull Request';
-            }, 2500);
+            }
         }
 
-        // Language-specific analysis patterns
+        // Enhanced language-specific analysis patterns
         const languagePatterns = {
             javascript: {
                 security: [
@@ -762,6 +1364,14 @@ class UserService {
                         description: 'eval() can execute arbitrary code and is a major security risk.',
                         suggestion: 'Avoid eval(). Use JSON.parse() for data or specific parsing methods.',
                         score: -30
+                    },
+                    {
+                        pattern: /exec\s*\(.*\$\{|exec\s*\(.*\+/gi,
+                        severity: 'critical',
+                        title: 'Command Injection Risk',
+                        description: 'Executing system commands with user input can be exploited.',
+                        suggestion: 'Validate and sanitize all inputs, use safer alternatives.',
+                        score: -30
                     }
                 ],
                 performance: [
@@ -774,12 +1384,20 @@ class UserService {
                         score: -20
                     },
                     {
-                        pattern: /setTimeout.*0\)/gi,
+                        pattern: /setTimeout.*0\)|setImmediate/gi,
                         severity: 'medium',
                         title: 'Inefficient Async Pattern',
                         description: 'setTimeout(..., 0) is an anti-pattern for async operations.',
                         suggestion: 'Use Promise.resolve().then() or proper async/await patterns.',
                         score: -8
+                    },
+                    {
+                        pattern: /for.*\{.*new\s+\w+\(/gi,
+                        severity: 'medium',
+                        title: 'Object Creation in Loop',
+                        description: 'Creating objects repeatedly in loops affects performance.',
+                        suggestion: 'Move object creation outside the loop or use object pooling.',
+                        score: -10
                     }
                 ],
                 logic: [
@@ -798,6 +1416,14 @@ class UserService {
                         description: 'Using == can cause unexpected type coercion.',
                         suggestion: 'Use === for strict equality comparison.',
                         score: -8
+                    },
+                    {
+                        pattern: /async.*function.*\{[^}]*(?!await)[^}]*fetch|async.*function.*\{[^}]*(?!await)[^}]*Promise\./gi,
+                        severity: 'medium',
+                        title: 'Missing await in Async Function',
+                        description: 'Async function contains Promise without await.',
+                        suggestion: 'Use await with Promise calls in async functions.',
+                        score: -10
                     }
                 ],
                 quality: [
@@ -810,12 +1436,20 @@ class UserService {
                         score: -3
                     },
                     {
+                        pattern: /console\.(log|error|warn|info)/gi,
+                        severity: 'low',
+                        title: 'Debug Console Statements',
+                        description: 'Console statements should be removed from production code.',
+                        suggestion: 'Use proper logging library or remove debug statements.',
+                        score: -2
+                    },
+                    {
                         pattern: /const\s+\w+|let\s+\w+/gi,
                         severity: 'low',
                         title: 'Modern Variable Declarations',
                         description: 'Good use of modern const/let declarations.',
                         suggestion: 'Excellent! Continue using const and let.',
-                        score: 3,
+                        score: 2,
                         positive: true
                     }
                 ]
@@ -855,14 +1489,6 @@ class UserService {
                         description: 'Multiple database queries in loops cause performance issues.',
                         suggestion: 'Use bulk operations or JOIN queries.',
                         score: -20
-                    },
-                    {
-                        pattern: /\+\s*=.*\[.*\]/gi,
-                        severity: 'medium',
-                        title: 'Inefficient List Concatenation',
-                        description: 'Using += for list concatenation is inefficient.',
-                        suggestion: 'Use list.extend() or list comprehension.',
-                        score: -8
                     }
                 ],
                 logic: [
@@ -873,370 +1499,16 @@ class UserService {
                         description: 'Catching all exceptions can hide important errors.',
                         suggestion: 'Catch specific exception types: except ValueError, TypeError:',
                         score: -10
-                    },
-                    {
-                        pattern: /is\s+(True|False)|==\s*(True|False)/gi,
-                        severity: 'low',
-                        title: 'Redundant Boolean Comparison',
-                        description: 'Comparing with True/False is unnecessary.',
-                        suggestion: 'Use the boolean value directly: if condition:',
-                        score: -5
                     }
                 ],
                 quality: [
                     {
-                        pattern: /global\s+\w+/gi,
-                        severity: 'low',
-                        title: 'Global Variable Usage',
-                        description: 'Global variables can make code harder to test and maintain.',
-                        suggestion: 'Consider passing variables as parameters or using class attributes.',
-                        score: -5
-                    },
-                    {
-                        pattern: /with\s+open\(|contextlib\./gi,
-                        severity: 'low',
-                        title: 'Proper Resource Management',
-                        description: 'Good use of context managers for resource handling.',
-                        suggestion: 'Excellent! Context managers ensure proper cleanup.',
-                        score: 5,
-                        positive: true
-                    }
-                ]
-            },
-            java: {
-                security: [
-                    {
-                        pattern: /Statement.*executeQuery.*\+/gi,
-                        severity: 'critical',
-                        title: 'SQL Injection Vulnerability',
-                        description: 'String concatenation in SQL queries allows injection attacks.',
-                        suggestion: 'Use PreparedStatement with parameterized queries.',
-                        score: -25
-                    },
-                    {
-                        pattern: /Runtime\.getRuntime\(\)\.exec/gi,
-                        severity: 'critical',
-                        title: 'Command Injection Risk',
-                        description: 'Executing system commands can be exploited.',
-                        suggestion: 'Validate and sanitize all inputs, use ProcessBuilder.',
-                        score: -30
-                    }
-                ],
-                performance: [
-                    {
-                        pattern: /for.*\{.*new\s+\w+\(/gi,
-                        severity: 'medium',
-                        title: 'Object Creation in Loop',
-                        description: 'Creating objects repeatedly in loops affects performance.',
-                        suggestion: 'Move object creation outside the loop or use object pooling.',
-                        score: -10
-                    },
-                    {
-                        pattern: /String.*\+.*\+/gi,
-                        severity: 'medium',
-                        title: 'Inefficient String Concatenation',
-                        description: 'String concatenation creates multiple temporary objects.',
-                        suggestion: 'Use StringBuilder for multiple concatenations.',
-                        score: -8
-                    }
-                ],
-                logic: [
-                    {
-                        pattern: /if\s*\([^)]*=\s*[^=]/gi,
-                        severity: 'critical',
-                        title: 'Assignment in Condition',
-                        description: 'Assignment operator (=) used instead of comparison (==).',
-                        suggestion: 'Use == for comparison or .equals() for objects.',
-                        score: -25
-                    },
-                    {
-                        pattern: /==.*String|String.*==/gi,
-                        severity: 'high',
-                        title: 'String Comparison with ==',
-                        description: 'Using == for string comparison checks reference, not value.',
-                        suggestion: 'Use .equals() or .compareTo() for string comparison.',
-                        score: -15
-                    }
-                ],
-                quality: [
-                    {
-                        pattern: /System\.out\.print/gi,
-                        severity: 'low',
-                        title: 'Console Output in Production Code',
-                        description: 'System.out should not be used in production code.',
-                        suggestion: 'Use proper logging framework like SLF4J or Log4j.',
-                        score: -3
-                    },
-                    {
-                        pattern: /private\s+final\s+|final\s+class/gi,
-                        severity: 'low',
-                        title: 'Proper Encapsulation',
-                        description: 'Good use of final and private modifiers.',
-                        suggestion: 'Excellent! Proper encapsulation improves code quality.',
-                        score: 3,
-                        positive: true
-                    }
-                ]
-            },
-            csharp: {
-                security: [
-                    {
-                        pattern: /SqlCommand.*CommandText.*\+/gi,
-                        severity: 'critical',
-                        title: 'SQL Injection Vulnerability',
-                        description: 'String concatenation in SQL commands allows injection attacks.',
-                        suggestion: 'Use parameterized queries with SqlParameter.',
-                        score: -25
-                    },
-                    {
-                        pattern: /Process\.Start.*input/gi,
-                        severity: 'high',
-                        title: 'Command Injection Risk',
-                        description: 'Starting processes with user input can be dangerous.',
-                        suggestion: 'Validate and sanitize all inputs before executing.',
-                        score: -20
-                    }
-                ],
-                performance: [
-                    {
-                        pattern: /for.*\{.*new\s+\w+\(/gi,
-                        severity: 'medium',
-                        title: 'Object Allocation in Loop',
-                        description: 'Frequent object creation can cause GC pressure.',
-                        suggestion: 'Reuse objects or use object pooling patterns.',
-                        score: -10
-                    },
-                    {
-                        pattern: /string.*\+.*\+/gi,
-                        severity: 'medium',
-                        title: 'Inefficient String Concatenation',
-                        description: 'String concatenation creates multiple temporary objects.',
-                        suggestion: 'Use StringBuilder or string interpolation ($"").',
-                        score: -8
-                    }
-                ],
-                logic: [
-                    {
-                        pattern: /if\s*\([^)]*=\s*[^=]/gi,
-                        severity: 'critical',
-                        title: 'Assignment in Condition',
-                        description: 'Assignment operator (=) used instead of comparison (==).',
-                        suggestion: 'Use == for comparison or .Equals() for objects.',
-                        score: -25
-                    }
-                ],
-                quality: [
-                    {
-                        pattern: /Console\.Write/gi,
-                        severity: 'low',
-                        title: 'Console Output in Production',
-                        description: 'Console output should not be used in production code.',
-                        suggestion: 'Use ILogger or other logging frameworks.',
-                        score: -3
-                    },
-                    {
-                        pattern: /using\s*\(.*\)|await\s+using/gi,
-                        severity: 'low',
-                        title: 'Proper Resource Disposal',
-                        description: 'Good use of using statements for resource management.',
-                        suggestion: 'Excellent! Using statements ensure proper disposal.',
-                        score: 5,
-                        positive: true
-                    }
-                ]
-            },
-            php: {
-                security: [
-                    {
-                        pattern: /mysql_query.*\$|mysqli_query.*\$_/gi,
-                        severity: 'critical',
-                        title: 'SQL Injection Vulnerability',
-                        description: 'Direct variable interpolation in SQL queries is dangerous.',
-                        suggestion: 'Use prepared statements with PDO or mysqli.',
-                        score: -25
-                    },
-                    {
-                        pattern: /eval\s*\(|\$\$|extract\s*\(/gi,
-                        severity: 'critical',
-                        title: 'Code Injection Risk',
-                        description: 'eval(), variable variables, and extract() are dangerous.',
-                        suggestion: 'Avoid eval() and variable variables. Sanitize extract() input.',
-                        score: -30
-                    }
-                ],
-                performance: [
-                    {
-                        pattern: /for.*\{.*mysql_query/gi,
-                        severity: 'high',
-                        title: 'Database Queries in Loop',
-                        description: 'Multiple database queries in loops cause performance issues.',
-                        suggestion: 'Use JOINs or prepare statements outside loops.',
-                        score: -20
-                    }
-                ],
-                logic: [
-                    {
-                        pattern: /if\s*\([^)]*=\s*[^=]/gi,
-                        severity: 'critical',
-                        title: 'Assignment in Condition',
-                        description: 'Assignment operator (=) used instead of comparison (==).',
-                        suggestion: 'Use == for comparison or === for strict comparison.',
-                        score: -25
-                    }
-                ],
-                quality: [
-                    {
-                        pattern: /\<\?php|\<\?=|\<\?/gi,
-                        severity: 'low',
-                        title: 'PHP Tag Usage',
-                        description: 'Using proper PHP opening tags.',
-                        suggestion: 'Always use <?php instead of short tags.',
-                        score: 2,
-                        positive: true
-                    }
-                ]
-            },
-            ruby: {
-                security: [
-                    {
-                        pattern: /ActiveRecord.*find_by_sql.*\#\{/gi,
-                        severity: 'critical',
-                        title: 'SQL Injection Vulnerability',
-                        description: 'String interpolation in SQL queries allows injection attacks.',
-                        suggestion: 'Use parameterized queries or ActiveRecord methods.',
-                        score: -25
-                    },
-                    {
-                        pattern: /eval\s*\(|instance_eval/gi,
-                        severity: 'high',
-                        title: 'Code Injection Risk',
-                        description: 'eval() and instance_eval() can execute arbitrary code.',
-                        suggestion: 'Avoid eval methods. Use send() with symbol validation.',
-                        score: -25
-                    }
-                ],
-                performance: [
-                    {
-                        pattern: /\.times\s*\{.*find\(/gi,
-                        severity: 'high',
-                        title: 'N+1 Query Problem',
-                        description: 'Database queries inside iteration blocks cause performance issues.',
-                        suggestion: 'Use includes(), joins(), or preload() for eager loading.',
-                        score: -20
-                    }
-                ],
-                logic: [
-                    {
-                        pattern: /if\s+\w+\s*=\s*[^=]/gi,
-                        severity: 'medium',
-                        title: 'Assignment in Condition',
-                        description: 'Assignment in conditional might be unintentional.',
-                        suggestion: 'Use == for comparison or wrap assignment in parentheses.',
-                        score: -15
-                    }
-                ],
-                quality: [
-                    {
-                        pattern: /def\s+\w+.*\n.*rescue\s*$/gi,
-                        severity: 'low',
-                        title: 'Bare Rescue Clause',
-                        description: 'Bare rescue catches all exceptions, including system errors.',
-                        suggestion: 'Rescue specific exception types: rescue StandardError.',
-                        score: -5
-                    }
-                ]
-            },
-            go: {
-                security: [
-                    {
-                        pattern: /fmt\.Sprintf.*SELECT.*%/gi,
-                        severity: 'critical',
-                        title: 'SQL Injection Vulnerability',
-                        description: 'String formatting in SQL queries allows injection attacks.',
-                        suggestion: 'Use parameterized queries with database/sql package.',
-                        score: -25
-                    },
-                    {
-                        pattern: /exec\.Command.*input/gi,
-                        severity: 'high',
-                        title: 'Command Injection Risk',
-                        description: 'Executing commands with user input can be dangerous.',
-                        suggestion: 'Validate and sanitize all inputs before executing.',
-                        score: -20
-                    }
-                ],
-                performance: [
-                    {
-                        pattern: /for.*range.*\{.*Query\(/gi,
-                        severity: 'high',
-                        title: 'Database Queries in Loop',
-                        description: 'Multiple database queries in loops cause performance issues.',
-                        suggestion: 'Use batch operations or single queries with JOINs.',
-                        score: -20
-                    }
-                ],
-                logic: [
-                    {
-                        pattern: /if\s+\w+\s*:=.*;.*err\s*!=\s*nil/gi,
-                        severity: 'low',
-                        title: 'Proper Error Handling',
-                        description: 'Good Go error handling pattern.',
-                        suggestion: 'Excellent! Continue checking errors explicitly.',
-                        score: 5,
-                        positive: true
-                    }
-                ],
-                quality: [
-                    {
-                        pattern: /fmt\.Print/gi,
+                        pattern: /print\s*\(/gi,
                         severity: 'low',
                         title: 'Print Statements in Code',
-                        description: 'Print statements should not be in production code.',
-                        suggestion: 'Use proper logging package like logrus or zap.',
-                        score: -3
-                    }
-                ]
-            },
-            rust: {
-                security: [
-                    {
-                        pattern: /unsafe\s*\{/gi,
-                        severity: 'high',
-                        title: 'Unsafe Code Block',
-                        description: 'Unsafe blocks bypass Rust\'s memory safety guarantees.',
-                        suggestion: 'Minimize unsafe code and document safety invariants.',
-                        score: -15
-                    }
-                ],
-                performance: [
-                    {
-                        pattern: /\.clone\(\).*\.clone\(\)/gi,
-                        severity: 'medium',
-                        title: 'Excessive Cloning',
-                        description: 'Multiple clones can impact performance unnecessarily.',
-                        suggestion: 'Use borrowing (&) instead of cloning when possible.',
-                        score: -8
-                    }
-                ],
-                logic: [
-                    {
-                        pattern: /unwrap\(\)/gi,
-                        severity: 'medium',
-                        title: 'Potential Panic with unwrap()',
-                        description: 'unwrap() can cause panics if the value is None or Err.',
-                        suggestion: 'Use match, if let, or expect() with descriptive messages.',
-                        score: -10
-                    }
-                ],
-                quality: [
-                    {
-                        pattern: /\?;|match.*\{.*Ok\(.*\).*Err\(.*\)/gi,
-                        severity: 'low',
-                        title: 'Proper Error Handling',
-                        description: 'Good use of Rust error handling patterns.',
-                        suggestion: 'Excellent! Proper error propagation and handling.',
-                        score: 5,
-                        positive: true
+                        description: 'Print statements should be replaced with proper logging.',
+                        suggestion: 'Use logging module instead of print statements.',
+                        score: -2
                     }
                 ]
             }
@@ -1246,57 +1518,74 @@ class UserService {
             const issues = [];
             let score = 85;
 
-            // Get language-specific patterns
-            const patterns = languagePatterns[language] || languagePatterns.javascript;
+            try {
+                // Get language-specific patterns
+                const patterns = languagePatterns[language] || languagePatterns.javascript;
 
-            // Apply all pattern categories
-            ['security', 'performance', 'logic', 'quality'].forEach(category => {
-                if (patterns[category]) {
-                    patterns[category].forEach(pattern => {
-                        const matches = [...code.matchAll(pattern.pattern)];
-                        
-                        matches.forEach(match => {
-                            const lineNum = getLineNumber(code, pattern.pattern);
-                            const codeSnippet = extractCodeSnippet(code, match[0]);
-                            
-                            issues.push({
-                                type: category.charAt(0).toUpperCase() + category.slice(1),
-                                severity: pattern.severity,
-                                title: pattern.title,
-                                description: pattern.description,
-                                line: lineNum,
-                                suggestion: pattern.suggestion,
-                                code: codeSnippet,
-                                positive: pattern.positive || false
-                            });
+                // Apply all pattern categories
+                ['security', 'performance', 'logic', 'quality'].forEach(category => {
+                    if (patterns[category]) {
+                        patterns[category].forEach(pattern => {
+                            try {
+                                const matches = [...code.matchAll(pattern.pattern)];
+                                
+                                matches.forEach(match => {
+                                    const lineNum = getLineNumber(code, match.index);
+                                    const codeSnippet = extractCodeSnippet(code, match[0]);
+                                    
+                                    issues.push({
+                                        type: category.charAt(0).toUpperCase() + category.slice(1),
+                                        severity: pattern.severity,
+                                        title: pattern.title,
+                                        description: pattern.description,
+                                        line: lineNum,
+                                        suggestion: pattern.suggestion,
+                                        code: codeSnippet,
+                                        positive: pattern.positive || false
+                                    });
 
-                            score += pattern.score;
+                                    score += pattern.score;
+                                });
+                            } catch (error) {
+                                console.warn(`Pattern matching error for ${category}:`, error);
+                            }
                         });
-                    });
+                    }
+                });
+
+                // Add complexity analysis
+                const complexity = analyzeComplexity(code);
+                score += complexity.score;
+                if (complexity.issues.length > 0) {
+                    issues.push(...complexity.issues);
                 }
-            });
 
-            // Add complexity analysis
-            const complexity = analyzeComplexity(code);
-            score += complexity.score;
-            if (complexity.issues.length > 0) {
-                issues.push(...complexity.issues);
+                // Language-specific enhancements
+                const langAnalysis = getLanguageSpecificAnalysis(code, language);
+                score += langAnalysis.scoreAdjustment;
+                issues.push(...langAnalysis.issues);
+
+                return {
+                    score: Math.max(0, Math.min(100, score)),
+                    issues: issues.sort((a, b) => getSeverityWeight(b.severity) - getSeverityWeight(a.severity)),
+                    language,
+                    platform: currentPlatform
+                };
+            } catch (error) {
+                throw new Error(`Analysis failed: ${error.message}`);
             }
+        }
 
-            // Language-specific enhancements
-            const langAnalysis = getLanguageSpecificAnalysis(code, language);
-            score += langAnalysis.scoreAdjustment;
-            issues.push(...langAnalysis.issues);
-
-            return {
-                score: Math.max(0, Math.min(100, score)),
-                issues: issues.sort((a, b) => getSeverityWeight(b.severity) - getSeverityWeight(a.severity)),
-                language,
-                platform: currentPlatform
-            };
+        function getLineNumber(code, matchIndex) {
+            if (typeof matchIndex !== 'number') {
+                return 1;
+            }
+            return code.substring(0, matchIndex).split('\n').length;
         }
 
         function extractCodeSnippet(code, matchText) {
+            if (!matchText) return 'Code snippet not available';
+            
             if (matchText.length > 80) {
                 return matchText.substring(0, 77) + '...';
             }
@@ -1307,68 +1596,72 @@ class UserService {
             const issues = [];
             let score = 0;
             
-            // Count cyclomatic complexity
-            const complexityPatterns = [
-                /\bif\s*\(/gi, /\belse\s*if\s*\(/gi, /\bwhile\s*\(/gi, 
-                /\bfor\s*\(/gi, /\bswitch\s*\(/gi, /\bcase\s+.*:/gi,
-                /\bcatch\s*\(/gi, /&&|\|\|/gi
-            ];
-            
-            let totalComplexity = 1; // Base complexity
-            complexityPatterns.forEach(pattern => {
-                const matches = code.match(pattern);
-                if (matches) totalComplexity += matches.length;
-            });
+            try {
+                // Count cyclomatic complexity
+                const complexityPatterns = [
+                    /\bif\s*\(/gi, /\belse\s*if\s*\(/gi, /\bwhile\s*\(/gi, 
+                    /\bfor\s*\(/gi, /\bswitch\s*\(/gi, /\bcase\s+.*:/gi,
+                    /\bcatch\s*\(/gi, /&&|\|\|/gi
+                ];
+                
+                let totalComplexity = 1; // Base complexity
+                complexityPatterns.forEach(pattern => {
+                    const matches = code.match(pattern);
+                    if (matches) totalComplexity += matches.length;
+                });
 
-            // Analyze function length
-            const lines = code.split('\n').filter(line => line.trim().length > 0);
-            
-            if (totalComplexity > 15) {
-                issues.push({
-                    type: 'Quality',
-                    severity: 'high',
-                    title: 'High Cyclomatic Complexity',
-                    description: `Function has cyclomatic complexity of ${totalComplexity} (threshold: 10).`,
-                    line: 1,
-                    suggestion: 'Break down into smaller, focused functions.',
-                    code: `Complexity: ${totalComplexity}`
-                });
-                score -= 15;
-            } else if (totalComplexity > 10) {
-                issues.push({
-                    type: 'Quality',
-                    severity: 'medium',
-                    title: 'Moderate Complexity',
-                    description: `Function complexity is ${totalComplexity}. Consider refactoring.`,
-                    line: 1,
-                    suggestion: 'Consider breaking into smaller functions.',
-                    code: `Complexity: ${totalComplexity}`
-                });
-                score -= 8;
-            }
+                // Analyze function length
+                const lines = code.split('\n').filter(line => line.trim().length > 0);
+                
+                if (totalComplexity > 15) {
+                    issues.push({
+                        type: 'Quality',
+                        severity: 'high',
+                        title: 'High Cyclomatic Complexity',
+                        description: `Function has cyclomatic complexity of ${totalComplexity} (threshold: 10).`,
+                        line: 1,
+                        suggestion: 'Break down into smaller, focused functions.',
+                        code: `Complexity: ${totalComplexity}`
+                    });
+                    score -= 15;
+                } else if (totalComplexity > 10) {
+                    issues.push({
+                        type: 'Quality',
+                        severity: 'medium',
+                        title: 'Moderate Complexity',
+                        description: `Function complexity is ${totalComplexity}. Consider refactoring.`,
+                        line: 1,
+                        suggestion: 'Consider breaking into smaller functions.',
+                        code: `Complexity: ${totalComplexity}`
+                    });
+                    score -= 8;
+                }
 
-            if (lines.length > 100) {
-                issues.push({
-                    type: 'Quality',
-                    severity: 'medium',
-                    title: 'Very Long Function',
-                    description: `Function has ${lines.length} lines (threshold: 50).`,
-                    line: 1,
-                    suggestion: 'Break into smaller, focused functions.',
-                    code: `${lines.length} lines of code`
-                });
-                score -= 12;
-            } else if (lines.length > 50) {
-                issues.push({
-                    type: 'Quality',
-                    severity: 'low',
-                    title: 'Long Function',
-                    description: `Function has ${lines.length} lines. Consider refactoring.`,
-                    line: 1,
-                    suggestion: 'Consider breaking into smaller functions.',
-                    code: `${lines.length} lines of code`
-                });
-                score -= 5;
+                if (lines.length > 100) {
+                    issues.push({
+                        type: 'Quality',
+                        severity: 'medium',
+                        title: 'Very Long Function',
+                        description: `Function has ${lines.length} lines (threshold: 50).`,
+                        line: 1,
+                        suggestion: 'Break into smaller, focused functions.',
+                        code: `${lines.length} lines of code`
+                    });
+                    score -= 12;
+                } else if (lines.length > 50) {
+                    issues.push({
+                        type: 'Quality',
+                        severity: 'low',
+                        title: 'Long Function',
+                        description: `Function has ${lines.length} lines. Consider refactoring.`,
+                        line: 1,
+                        suggestion: 'Consider breaking into smaller functions.',
+                        code: `${lines.length} lines of code`
+                    });
+                    score -= 5;
+                }
+            } catch (error) {
+                console.warn('Complexity analysis error:', error);
             }
 
             return { issues, score };
@@ -1378,290 +1671,49 @@ class UserService {
             const issues = [];
             let scoreAdjustment = 0;
 
-            // Additional language-specific checks
-            switch (language) {
-                case 'javascript':
-                case 'typescript':
-                    // Check for console statements
-                    if (/console\.(log|error|warn|info)/gi.test(code)) {
-                        issues.push({
-                            type: 'Quality',
-                            severity: 'low',
-                            title: 'Debug Console Statements',
-                            description: 'Console statements should be removed from production code.',
-                            line: getLineNumber(code, /console\./gi),
-                            suggestion: 'Use proper logging library or remove debug statements.',
-                            code: code.match(/console\.[^;]*/gi)?.[0] || 'Console statement'
-                        });
-                        scoreAdjustment -= 2;
-                    }
-
-                    // Check for proper async/await usage
-                    if (/async.*function.*\{[^}]*(?!await)[^}]*Promise\./gi.test(code)) {
-                        issues.push({
-                            type: 'Best Practice',
-                            severity: 'medium',
-                            title: 'Missing await in Async Function',
-                            description: 'Async function contains Promise without await.',
-                            line: getLineNumber(code, /async.*function/gi),
-                            suggestion: 'Use await with Promise calls in async functions.',
-                            code: 'Async function with unhandled Promise'
-                        });
-                        scoreAdjustment -= 8;
-                    }
-
-                    // TypeScript specific checks
-                    if (language === 'typescript') {
-                        if (/any\s*;|:\s*any/gi.test(code)) {
+            try {
+                // Additional language-specific checks
+                switch (language) {
+                    case 'javascript':
+                    case 'typescript':
+                        // Check for proper documentation
+                        if (/\/\*\*[\s\S]*?\*\//.test(code)) {
                             issues.push({
-                                type: 'Type Safety',
-                                severity: 'medium',
-                                title: 'Usage of "any" Type',
-                                description: 'Using "any" defeats the purpose of TypeScript\'s type safety.',
-                                line: getLineNumber(code, /any\s*;|:\s*any/gi),
-                                suggestion: 'Use specific types or interfaces instead of "any".',
-                                code: 'any type usage detected'
+                                type: 'Documentation',
+                                severity: 'low',
+                                title: 'Good Documentation',
+                                description: 'Code includes JSDoc comments for better maintainability.',
+                                line: getLineNumber(code, code.search(/\/\*\*/)),
+                                suggestion: 'Excellent! Continue documenting your code.',
+                                code: 'JSDoc comments found',
+                                positive: true
                             });
-                            scoreAdjustment -= 10;
+                            scoreAdjustment += 3;
                         }
-                    }
-                    break;
+                        break;
 
-                case 'python':
-                    // Check for print statements
-                    if (/print\s*\(/gi.test(code)) {
-                        issues.push({
-                            type: 'Quality',
-                            severity: 'low',
-                            title: 'Print Statements in Code',
-                            description: 'Print statements should be replaced with proper logging.',
-                            line: getLineNumber(code, /print\s*\(/gi),
-                            suggestion: 'Use logging module instead of print statements.',
-                            code: code.match(/print\([^)]*\)/gi)?.[0] || 'Print statement'
-                        });
-                        scoreAdjustment -= 2;
-                    }
-
-                    // Check for list comprehension instead of loops
-                    if (/for\s+\w+\s+in.*:\s*\n\s*\w+\.append/gi.test(code)) {
-                        issues.push({
-                            type: 'Best Practice',
-                            severity: 'low',
-                            title: 'Use List Comprehension',
-                            description: 'Simple append loops can be replaced with list comprehensions.',
-                            line: getLineNumber(code, /for\s+\w+\s+in.*:\s*\n\s*\w+\.append/gi),
-                            suggestion: 'Use list comprehension for better readability and performance.',
-                            code: 'For loop with append'
-                        });
-                        scoreAdjustment -= 3;
-                    }
-
-                    // Check for proper docstrings
-                    if (/def\s+\w+.*:\s*\n\s*""".*"""/gi.test(code)) {
-                        issues.push({
-                            type: 'Documentation',
-                            severity: 'low',
-                            title: 'Good Documentation',
-                            description: 'Function has proper docstring documentation.',
-                            line: getLineNumber(code, /def\s+\w+/gi),
-                            suggestion: 'Excellent! Continue documenting functions.',
-                            code: 'Docstring present',
-                            positive: true
-                        });
-                        scoreAdjustment += 3;
-                    }
-                    break;
-
-                case 'java':
-                    // Check for proper exception handling
-                    if (/catch\s*\(\s*Exception\s+/gi.test(code)) {
-                        issues.push({
-                            type: 'Error Handling',
-                            severity: 'medium',
-                            title: 'Catching Generic Exception',
-                            description: 'Catching generic Exception can hide specific error types.',
-                            line: getLineNumber(code, /catch\s*\(\s*Exception/gi),
-                            suggestion: 'Catch specific exception types when possible.',
-                            code: 'catch (Exception e)'
-                        });
-                        scoreAdjustment -= 8;
-                    }
-
-                    // Check for proper resource management
-                    if (/try\s*\([^)]*\)/gi.test(code)) {
-                        issues.push({
-                            type: 'Resource Management',
-                            severity: 'low',
-                            title: 'Try-with-Resources',
-                            description: 'Good use of try-with-resources for automatic resource management.',
-                            line: getLineNumber(code, /try\s*\(/gi),
-                            suggestion: 'Excellent! Resources will be automatically closed.',
-                            code: 'Try-with-resources detected',
-                            positive: true
-                        });
-                        scoreAdjustment += 5;
-                    }
-                    break;
-
-                case 'csharp':
-                    // Check for proper null checking
-                    if (/\w+\.\w+.*null/gi.test(code) && !/\?\./gi.test(code)) {
-                        issues.push({
-                            type: 'Null Safety',
-                            severity: 'medium',
-                            title: 'Potential Null Reference',
-                            description: 'Object might be null before accessing its members.',
-                            line: getLineNumber(code, /\w+\.\w+/gi),
-                            suggestion: 'Use null-conditional operator (?.) or null checking.',
-                            code: 'Potential null reference access'
-                        });
-                        scoreAdjustment -= 10;
-                    }
-
-                    // Check for async/await best practices
-                    if (/\.Result|\.Wait\(\)/gi.test(code)) {
-                        issues.push({
-                            type: 'Async Pattern',
-                            severity: 'high',
-                            title: 'Blocking Async Call',
-                            description: 'Using .Result or .Wait() can cause deadlocks.',
-                            line: getLineNumber(code, /\.Result|\.Wait\(\)/gi),
-                            suggestion: 'Use await instead of .Result or .Wait().',
-                            code: code.match(/\.[^;]*(?:Result|Wait\(\))/gi)?.[0] || 'Blocking async call'
-                        });
-                        scoreAdjustment -= 15;
-                    }
-                    break;
-
-                case 'php':
-                    // Check for error reporting
-                    if (/error_reporting\(0\)|ini_set.*error_reporting.*0/gi.test(code)) {
-                        issues.push({
-                            type: 'Error Handling',
-                            severity: 'medium',
-                            title: 'Error Reporting Disabled',
-                            description: 'Disabling error reporting can hide important issues.',
-                            line: getLineNumber(code, /error_reporting\(0\)/gi),
-                            suggestion: 'Use proper error handling instead of disabling error reporting.',
-                            code: 'Error reporting disabled'
-                        });
-                        scoreAdjustment -= 10;
-                    }
-
-                    // Check for proper variable initialization
-                    if (/\$\w+\s*=.*\$_(?:GET|POST|REQUEST)\[/gi.test(code)) {
-                        issues.push({
-                            type: 'Security',
-                            severity: 'high',
-                            title: 'Unsanitized Input Usage',
-                            description: 'Direct use of superglobal variables without sanitization.',
-                            line: getLineNumber(code, /\$_(?:GET|POST|REQUEST)/gi),
-                            suggestion: 'Sanitize and validate all user inputs using filter_var() or similar.',
-                            code: code.match(/\$\w+\s*=.*\$_(?:GET|POST|REQUEST)\[[^\]]*\]/gi)?.[0] || 'Unsanitized input'
-                        });
-                        scoreAdjustment -= 20;
-                    }
-                    break;
-
-                case 'ruby':
-                    // Check for proper string interpolation
-                    if (/\+.*".*".*\+/gi.test(code)) {
-                        issues.push({
-                            type: 'Best Practice',
-                            severity: 'low',
-                            title: 'String Concatenation',
-                            description: 'String concatenation with + is less efficient than interpolation.',
-                            line: getLineNumber(code, /\+.*".*".*\+/gi),
-                            suggestion: 'Use string interpolation: "text #{variable}" instead of concatenation.',
-                            code: 'String concatenation with +'
-                        });
-                        scoreAdjustment -= 3;
-                    }
-
-                    // Check for proper method naming
-                    if (/def\s+[A-Z]\w*/gi.test(code)) {
-                        issues.push({
-                            type: 'Naming Convention',
-                            severity: 'low',
-                            title: 'Method Naming Convention',
-                            description: 'Ruby method names should be snake_case, not PascalCase.',
-                            line: getLineNumber(code, /def\s+[A-Z]\w*/gi),
-                            suggestion: 'Use snake_case for method names: def my_method instead of def MyMethod.',
-                            code: code.match(/def\s+[A-Z]\w*/gi)?.[0] || 'PascalCase method name'
-                        });
-                        scoreAdjustment -= 2;
-                    }
-                    break;
-
-                case 'go':
-                    // Check for proper error handling patterns
-                    if (/err\s*:=.*\n(?!\s*if\s+err\s*!=\s*nil)/gi.test(code)) {
-                        issues.push({
-                            type: 'Error Handling',
-                            severity: 'medium',
-                            title: 'Unchecked Error',
-                            description: 'Error variable assigned but not checked immediately.',
-                            line: getLineNumber(code, /err\s*:=/gi),
-                            suggestion: 'Check error immediately after assignment: if err != nil { ... }',
-                            code: 'Unchecked error variable'
-                        });
-                        scoreAdjustment -= 10;
-                    }
-
-                    // Check for goroutine best practices
-                    if (/go\s+func.*\{.*panic/gi.test(code)) {
-                        issues.push({
-                            type: 'Concurrency',
-                            severity: 'high',
-                            title: 'Panic in Goroutine',
-                            description: 'Panic in goroutine can crash the entire program.',
-                            line: getLineNumber(code, /go\s+func/gi),
-                            suggestion: 'Handle errors gracefully in goroutines, avoid panic.',
-                            code: 'Goroutine with panic'
-                        });
-                        scoreAdjustment -= 15;
-                    }
-                    break;
-
-                case 'rust':
-                    // Check for proper Option/Result handling
-                    if (/\.unwrap\(\).*\.unwrap\(\)/gi.test(code)) {
-                        issues.push({
-                            type: 'Error Handling',
-                            severity: 'high',
-                            title: 'Multiple unwrap() Calls',
-                            description: 'Multiple unwrap() calls can cause cascading panics.',
-                            line: getLineNumber(code, /\.unwrap\(\)/gi),
-                            suggestion: 'Use ? operator or proper error handling with match.',
-                            code: 'Multiple unwrap() calls'
-                        });
-                        scoreAdjustment -= 12;
-                    }
-
-                    // Check for lifetime annotations
-                    if (/'[a-z]+.*struct.*\{/gi.test(code)) {
-                        issues.push({
-                            type: 'Memory Management',
-                            severity: 'low',
-                            title: 'Proper Lifetime Management',
-                            description: 'Good use of lifetime annotations in structs.',
-                            line: getLineNumber(code, /'[a-z]+/gi),
-                            suggestion: 'Excellent! Proper lifetime management prevents dangling references.',
-                            code: 'Lifetime annotations present',
-                            positive: true
-                        });
-                        scoreAdjustment += 5;
-                    }
-                    break;
+                    case 'python':
+                        // Check for proper docstrings
+                        if (/def\s+\w+.*:\s*\n\s*""".*"""/gi.test(code)) {
+                            issues.push({
+                                type: 'Documentation',
+                                severity: 'low',
+                                title: 'Good Documentation',
+                                description: 'Function has proper docstring documentation.',
+                                line: getLineNumber(code, code.search(/def\s+\w+/gi)),
+                                suggestion: 'Excellent! Continue documenting functions.',
+                                code: 'Docstring present',
+                                positive: true
+                            });
+                            scoreAdjustment += 3;
+                        }
+                        break;
+                }
+            } catch (error) {
+                console.warn('Language-specific analysis error:', error);
             }
 
             return { issues, scoreAdjustment };
-        }
-
-        function getLineNumber(code, pattern) {
-            const match = code.search(pattern);
-            if (match === -1) return 1;
-            return code.substring(0, match).split('\n').length;
         }
 
         function getSeverityWeight(severity) {
@@ -1670,87 +1722,268 @@ class UserService {
         }
 
         function showResults(analysis) {
-            const resultsDiv = document.getElementById('results');
-            const summaryDiv = document.getElementById('summary');
-            const issuesDiv = document.getElementById('issues');
+            try {
+                const resultsDiv = document.getElementById('results');
+                const summaryDiv = document.getElementById('summary');
+                const issuesDiv = document.getElementById('issues');
 
-            // Summary
-            const negativeIssues = analysis.issues.filter(i => !i.positive);
-            const criticalCount = negativeIssues.filter(i => i.severity === 'critical').length;
-            const highCount = negativeIssues.filter(i => i.severity === 'high').length;
-            const mediumCount = negativeIssues.filter(i => i.severity === 'medium').length;
-            const lowCount = negativeIssues.filter(i => i.severity === 'low').length;
+                // Summary
+                const negativeIssues = analysis.issues.filter(i => !i.positive);
+                const criticalCount = negativeIssues.filter(i => i.severity === 'critical').length;
+                const highCount = negativeIssues.filter(i => i.severity === 'high').length;
+                const mediumCount = negativeIssues.filter(i => i.severity === 'medium').length;
+                const lowCount = negativeIssues.filter(i => i.severity === 'low').length;
 
-            const riskLevel = analysis.score >= 80 ? 'Low Risk' : 
-                             analysis.score >= 60 ? 'Medium Risk' : 'High Risk';
+                const riskLevel = analysis.score >= 80 ? 'Low Risk' : 
+                                 analysis.score >= 60 ? 'Medium Risk' : 'High Risk';
 
-            const scoreColor = analysis.score >= 80 ? 'var(--success-color)' : 
-                              analysis.score >= 60 ? 'var(--warning-color)' : 'var(--error-color)';
+                const scoreColor = analysis.score >= 80 ? 'var(--success-color)' : 
+                                  analysis.score >= 60 ? 'var(--warning-color)' : 'var(--error-color)';
 
-            summaryDiv.innerHTML = `
-                <div class="summary-header">
-                    <div>
-                        <div class="summary-title">Code Review Results</div>
-                        <div style="margin-top: 0.5rem;">
-                            <div><strong>Platform:</strong> ${analysis.platform.charAt(0).toUpperCase() + analysis.platform.slice(1)}</div>
-                            <div><strong>Language:</strong> ${analysis.language.charAt(0).toUpperCase() + analysis.language.slice(1)}</div>
-                            <div><strong>Risk Level:</strong> <span style="color: ${scoreColor};">${riskLevel}</span></div>
+                summaryDiv.innerHTML = `
+                    <div class="summary-header">
+                        <div>
+                            <div class="summary-title">Code Review Results</div>
+                            <div style="margin-top: 0.5rem;">
+                                <div><strong>Platform:</strong> ${analysis.platform.charAt(0).toUpperCase() + analysis.platform.slice(1)}</div>
+                                <div><strong>Language:</strong> ${analysis.language.charAt(0).toUpperCase() + analysis.language.slice(1)}</div>
+                                <div><strong>Risk Level:</strong> <span style="color: ${scoreColor};">${riskLevel}</span></div>
+                                ${analysis.aiProvider ? `<div><strong>Analysis:</strong> ${analysis.aiProvider}</div>` : ''}
+                            </div>
+                        </div>
+                        <div class="score-display">
+                            <div class="score-number" style="color: ${scoreColor};">${analysis.score}</div>
+                            <div class="score-label">out of 100</div>
                         </div>
                     </div>
-                    <div class="score-display">
-                        <div class="score-number" style="color: ${scoreColor};">${analysis.score}</div>
-                        <div class="score-label">out of 100</div>
-                    </div>
-                </div>
-                ${negativeIssues.length > 0 ? `
-                    <div class="summary-badges">
-                        ${criticalCount > 0 ? `<div class="badge critical">🚨 ${criticalCount} Critical</div>` : ''}
-                        ${highCount > 0 ? `<div class="badge high">⚠️ ${highCount} High</div>` : ''}
-                        ${mediumCount > 0 ? `<div class="badge medium">⚡ ${mediumCount} Medium</div>` : ''}
-                        ${lowCount > 0 ? `<div class="badge low">ℹ️ ${lowCount} Info</div>` : ''}
-                    </div>
-                ` : ''}
-            `;
-
-            // Issues
-            if (analysis.issues.length === 0 || negativeIssues.length === 0) {
-                issuesDiv.innerHTML = `
-                    <div class="no-issues">
-                        <div class="no-issues-icon">🎉</div>
-                        <h3>No Issues Found!</h3>
-                        <p>Your code looks clean and follows best practices.</p>
-                    </div>
+                    ${negativeIssues.length > 0 ? `
+                        <div class="summary-badges">
+                            ${criticalCount > 0 ? `<div class="badge critical">🚨 ${criticalCount} Critical</div>` : ''}
+                            ${highCount > 0 ? `<div class="badge high">⚠️ ${highCount} High</div>` : ''}
+                            ${mediumCount > 0 ? `<div class="badge medium">⚡ ${mediumCount} Medium</div>` : ''}
+                            ${lowCount > 0 ? `<div class="badge low">ℹ️ ${lowCount} Info</div>` : ''}
+                        </div>
+                    ` : ''}
                 `;
-            } else {
-                issuesDiv.innerHTML = negativeIssues.map(issue => {
-                    const severityIcon = {
-                        critical: '🚨',
-                        high: '⚠️',
-                        medium: '⚡',
-                        low: 'ℹ️'
-                    }[issue.severity];
 
-                    return `
-                        <div class="issue-card ${issue.severity}">
-                            <div class="issue-header">
-                                <div class="issue-title">${issue.title}</div>
-                                <div class="issue-meta">
-                                    <div class="badge ${issue.severity}">
-                                        ${severityIcon} ${issue.severity.charAt(0).toUpperCase() + issue.severity.slice(1)}
-                                    </div>
-                                    <div style="font-size: 0.85rem; color: var(--text-secondary);">
-                                        Line ${issue.line} • ${issue.type}
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="issue-description">${issue.description}</div>
-                            <div class="code-block">${issue.code}</div>
-                            <div class="suggestion">
-                                <div class="suggestion-title">💡 Suggestion</div>
-                                <div>${issue.suggestion}</div>
-                            </div>
+                // Issues
+                if (analysis.issues.length === 0 || negativeIssues.length === 0) {
+                    issuesDiv.innerHTML = `
+                        <div class="no-issues">
+                            <div class="no-issues-icon">🎉</div>
+                            <h3>No Issues Found!</h3>
+                            <p>Your code looks clean and follows best practices.</p>
                         </div>
                     `;
-                }).join('');
-            }}
+                } else {
+                    issuesDiv.innerHTML = negativeIssues.map(issue => {
+                        const severityIcon = {
+                            critical: '🚨',
+                            high: '⚠️',
+                            medium: '⚡',
+                            low: 'ℹ️'
+                        }[issue.severity];
+
+                        return `
+                            <div class="issue-card ${issue.severity}">
+                                <div class="issue-header">
+                                    <div class="issue-title">${issue.title}</div>
+                                    <div class="issue-meta">
+                                        <div class="badge ${issue.severity}">
+                                            ${severityIcon} ${issue.severity.charAt(0).toUpperCase() + issue.severity.slice(1)}
+                                        </div>
+                                        <div style="font-size: 0.85rem; color: var(--text-secondary);">
+                                            Line ${issue.line} • ${issue.type}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="issue-description">${issue.description}</div>
+                                <div class="code-block">${issue.code}</div>
+                                <div class="suggestion">
+                                    <div class="suggestion-title">💡 Suggestion</div>
+                                    <div>${issue.suggestion}</div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+
+                // Show results and scroll to them
+                resultsDiv.style.display = 'block';
+                resultsDiv.scrollIntoView({ behavior: 'smooth' });
+                
+                // Add export functionality
+                addExportButton();
+
+            } catch (error) {
+                showError(`Failed to display results: ${error.message}`);
+            }
+        }
+
+        // Initialize the app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, initializing app...');
             
+            // Force show the correct initial state
+            document.querySelectorAll('.platform-content').forEach(content => {
+                content.style.display = 'none';
+            });
+            
+            // Show GitHub panel by default
+            const githubPanel = document.getElementById('github-panel');
+            if (githubPanel) {
+                githubPanel.style.display = 'block';
+                console.log('GitHub panel shown');
+            }
+            
+            initApp();
+            
+            // Load saved API tokens
+            const savedGitHubToken = sessionStorage.getItem('github_token');
+            const savedGitLabToken = sessionStorage.getItem('gitlab_token');
+            const savedAIToken = sessionStorage.getItem('ai_token');
+            
+            if (savedGitHubToken) {
+                document.getElementById('github-token').value = savedGitHubToken;
+            }
+            if (savedGitLabToken) {
+                document.getElementById('gitlab-token').value = savedGitLabToken;
+            }
+            if (savedAIToken) {
+                document.getElementById('ai-token').value = savedAIToken;
+            }
+            
+            // Initialize all platform features
+            initializePlatformFeatures('github');
+            initializePlatformFeatures('gitlab');
+            initializePlatformFeatures('cli');
+            
+            // Add debug click handlers to test tab switching
+            setTimeout(() => {
+                console.log('Adding debug test...');
+                const allTabs = document.querySelectorAll('.platform-tab');
+                console.log('Found tabs:', allTabs.length);
+                allTabs.forEach((tab, index) => {
+                    console.log(`Tab ${index}: ${tab.dataset.platform}, Active: ${tab.classList.contains('active')}`);
+                });
+                
+                // Test GitLab tab specifically
+                const gitlabTab = document.querySelector('[data-platform="gitlab"]');
+                const cliTab = document.querySelector('[data-platform="cli"]');
+                console.log('GitLab tab found:', !!gitlabTab);
+                console.log('CLI tab found:', !!cliTab);
+                
+                if (gitlabTab) {
+                    gitlabTab.addEventListener('click', function() {
+                        console.log('GitLab tab direct click handler triggered');
+                    });
+                }
+                
+                if (cliTab) {
+                    cliTab.addEventListener('click', function() {
+                        console.log('CLI tab direct click handler triggered');
+                    });
+                }
+            }, 500);
+        });
+
+        // Check GitHub API rate limit
+        async function checkGitHubRateLimit() {
+            try {
+                const token = document.getElementById('github-token').value.trim();
+                const headers = {
+                    'Accept': 'application/vnd.github.v3+json',
+                    'User-Agent': 'AI-PR-Reviewer'
+                };
+                
+                if (token) {
+                    headers['Authorization'] = `token ${token}`;
+                }
+
+                const response = await fetch('https://api.github.com/rate_limit', { headers });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    const remaining = data.rate.remaining;
+                    const resetTime = new Date(data.rate.reset * 1000);
+                    
+                    let rateLimitInfo = document.querySelector('#github-panel .rate-limit-info');
+                    if (!rateLimitInfo) {
+                        rateLimitInfo = document.createElement('div');
+                        rateLimitInfo.className = 'rate-limit-info';
+                        document.getElementById('github-panel').appendChild(rateLimitInfo);
+                    }
+                    
+                    rateLimitInfo.innerHTML = `
+                        <strong>GitHub API Status:</strong><br>
+                        Remaining calls: ${remaining}/${data.rate.limit}<br>
+                        Rate limit resets: ${resetTime.toLocaleTimeString()}<br>
+                        ${token ? '✅ Authenticated' : '⚠️ Unauthenticated (lower limits)'}
+                    `;
+                }
+            } catch (error) {
+                // Silently fail - rate limit check is not critical
+                console.warn('Could not check GitHub rate limit:', error);
+            }
+        }
+
+        // Export analysis results
+        function exportResults(format = 'json') {
+            const results = document.getElementById('results');
+            if (results.style.display === 'none') {
+                showError('No analysis results to export');
+                return;
+            }
+
+            const analysisData = {
+                timestamp: new Date().toISOString(),
+                platform: currentPlatform,
+                language: document.getElementById('language').value,
+                commitMessage: document.getElementById('commitMessage').value,
+                issues: Array.from(document.querySelectorAll('.issue-card')).map(card => {
+                    return {
+                        title: card.querySelector('.issue-title').textContent,
+                        severity: card.className.split(' ').pop(),
+                        description: card.querySelector('.issue-description').textContent,
+                        suggestion: card.querySelector('.suggestion div:last-child').textContent,
+                        code: card.querySelector('.code-block').textContent
+                    };
+                }),
+                score: parseInt(document.querySelector('.score-number').textContent)
+            };
+
+            const blob = new Blob([JSON.stringify(analysisData, null, 2)], {
+                type: 'application/json'
+            });
+            
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `pr-analysis-${Date.now()}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showAPIStatus('Analysis results exported successfully', 'success', `${currentPlatform}-panel`);
+        }
+
+        // Add export button functionality
+        function addExportButton() {
+            const resultsDiv = document.getElementById('results');
+            if (resultsDiv && resultsDiv.style.display !== 'none') {
+                let exportBtn = document.getElementById('export-btn');
+                if (!exportBtn) {
+                    exportBtn = document.createElement('button');
+                    exportBtn.id = 'export-btn';
+                    exportBtn.className = 'demo-btn';
+                    exportBtn.style.marginTop = '1rem';
+                    exportBtn.innerHTML = '💾 Export Results';
+                    exportBtn.onclick = () => exportResults();
+                    resultsDiv.appendChild(exportBtn);
+                }
+            }
+        }
+    </script>
+</body>
+</html>
