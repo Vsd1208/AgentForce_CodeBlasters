@@ -3,15 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI PR Reviewer - Intelligent Code Review Agent</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-clike.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-css.min.js"></script>
+    <title>AI PR Reviewer</title>
     <style>
+        :root {
+            --primary-color: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary-color: #64748b;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --error-color: #ef4444;
+            --critical-color: #dc2626;
+            --background: #f8fafc;
+            --surface: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+                    }
+
         * {
             margin: 0;
             padding: 0;
@@ -20,312 +29,349 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #ff0f02 0%, #ee0b6d 100%);
-            min-height: 100vh;
-            color: #333;
+            background: var(--background);
+            color: var(--text-primary);
+            line-height: 1.5;
         }
 
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 2rem;
         }
 
         .header {
             text-align: center;
-            margin-bottom: 40px;
-            color: rgb(162, 234, 241);
+            margin-bottom: 2rem;
         }
 
         .header h1 {
             font-size: 2.5rem;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(157, 155, 155, 0.3);
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
         }
 
         .header p {
+            color: var(--text-secondary);
             font-size: 1.1rem;
-            opacity: 0.9;
         }
 
         .main-card {
-            background: rgb(180, 255, 251);
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 20px 40px rgba(235, 232, 232, 0.1);
-            backdrop-filter: blur(10px);
-        }
-
-        .platform-selector {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 30px;
-            justify-content: center;
-        }
-
-        .platform-btn {
-            padding: 12px 24px;
-            border: 2px solid #e1e5e9;
+            background: var(--surface);
             border-radius: 12px;
-            background: rgb(196, 209, 159);
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        .platform-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            background: var(--background);
+            padding: 0.25rem;
+            border-radius: 8px;
+        }
+
+        .platform-tab {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border: none;
+            background: transparent;
+            border-radius: 6px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            font-weight: 500;
+            transition: all 0.2s;
         }
 
-        .platform-btn:hover {
-            border-color: #667eea;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
-        }
-
-        .platform-btn.active {
-            background: #ba4069;
+        .platform-tab.active {
+            background: var(--primary-color);
             color: white;
-            border-color: #ba4069;
         }
 
-        .input-section {
-            margin-bottom: 30px;
+        .demo-section {
+            margin-bottom: 1.5rem;
         }
 
-        .input-group {
-            margin-bottom: 20px;
-        }
-
-        .input-group label {
-            display: block;
-            margin-bottom: 8px;
+        .demo-label {
             font-weight: 600;
-            color: #374151;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
         }
 
-        .input-group input,
-        .input-group textarea {
-            width: 100%;
-            padding: 12px 16px;
-            border: 2px solid #e1e5e9;
-            border-radius: 12px;
-            font-size: 14px;
-            transition: all 0.3s ease;
-            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+        .demo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 0.75rem;
         }
 
-        .input-group input:focus,
-        .input-group textarea:focus {
+        .demo-btn {
+            padding: 0.75rem;
+            background: var(--background);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            text-align: left;
+            transition: all 0.2s;
+        }
+
+        .demo-btn:hover {
+            border-color: var(--primary-color);
+            background: white;
+        }
+
+        .form-grid {
+            display: grid;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 200px;
+            gap: 1rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-label {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .form-input, .form-textarea, .form-select {
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            transition: border-color 0.2s;
+        }
+
+        .form-input:focus, .form-textarea:focus, .form-select:focus {
             outline: none;
-            border-color: #3d4fb2;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgb(37 99 235 / 0.1);
         }
 
-        .code-input {
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+            font-family: 'Monaco', 'Menlo', monospace;
+        }
+
+        .code-textarea {
             min-height: 200px;
-            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-            font-size: 13px;
-            line-height: 1.5;
         }
 
-        .review-btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        .analyze-btn {
+            background: var(--primary-color);
             color: white;
             border: none;
-            padding: 15px 30px;
-            border-radius: 12px;
-            font-size: 16px;
+            padding: 1rem 2rem;
+            border-radius: 8px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
-            display: block;
+            transition: background-color 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
             margin: 0 auto;
         }
 
-        .review-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        .analyze-btn:hover:not(:disabled) {
+            background: var(--primary-dark);
         }
 
-        .review-btn:disabled {
+        .analyze-btn:disabled {
             opacity: 0.6;
             cursor: not-allowed;
-            transform: none;
-        }
-
-        .loading {
-            text-align: center;
-            padding: 40px;
-            display: none;
         }
 
         .spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #667eea;
+            width: 20px;
+            height: 20px;
+            border: 2px solid transparent;
+            border-top: 2px solid currentColor;
             border-radius: 50%;
             animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
+            display: none;
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            to { transform: rotate(360deg); }
         }
 
         .results {
+            margin-top: 2rem;
             display: none;
-            margin-top: 30px;
         }
 
         .summary-card {
-            background: #f8fafc;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            padding: 1.5rem;
             border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 20px;
-            border-left: 4px solid #667eea;
+            margin-bottom: 1.5rem;
         }
 
-        .severity-critical { border-left-color: #dc2626; }
-        .severity-high { border-left-color: #ea580c; }
-        .severity-medium { border-left-color: #d97706; }
-        .severity-low { border-left-color: #16a34a; }
-        .severity-info { border-left-color: #0ea5e9; }
+        .summary-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
 
-        .severity-badge {
-            display: inline-block;
-            padding: 4px 12px;
+        .summary-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .score-display {
+            text-align: center;
+        }
+
+        .score-number {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .score-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .summary-badges {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            padding: 0.5rem 1rem;
             border-radius: 20px;
-            font-size: 12px;
+            font-size: 0.85rem;
             font-weight: 600;
-            text-transform: uppercase;
-            margin-right: 10px;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
         }
 
-        .badge-critical { background: #fee2e2; color: #dc2626; }
-        .badge-high { background: #fed7aa; color: #ea580c; }
-        .badge-medium { background: #fcd5ce; color: #d97706; }
-        .badge-low { background: #dcfce7; color: #16a34a; }
-        .badge-info { background: #dbeafe; color: #0ea5e9; }
+        .badge.critical { background: rgba(239, 68, 68, 0.2); color: var(--critical-color); }
+        .badge.high { background: rgba(245, 158, 11, 0.2); color: var(--warning-color); }
+        .badge.medium { background: rgba(59, 130, 246, 0.2); color: var(--primary-color); }
+        .badge.low { background: rgba(16, 185, 129, 0.2); color: var(--success-color); }
+
+        .issues-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
 
         .issue-card {
-            background: white;
+            background: var(--surface);
+            border: 1px solid var(--border);
             border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 15px;
-            border: 1px solid #e5e7eb;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            padding: 1.5rem;
+            border-left: 4px solid;
         }
+
+        .issue-card.critical { border-left-color: var(--critical-color); }
+        .issue-card.high { border-left-color: var(--warning-color); }
+        .issue-card.medium { border-left-color: var(--primary-color); }
+        .issue-card.low { border-left-color: var(--success-color); }
 
         .issue-header {
             display: flex;
-            align-items: center;
-            margin-bottom: 12px;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+            gap: 1rem;
         }
 
         .issue-title {
-            font-weight: 600;
-            margin-left: 10px;
-            flex-grow: 1;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--text-primary);
+        }
+
+        .issue-meta {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            flex-shrink: 0;
         }
 
         .issue-description {
-            color: #6b7280;
-            margin-bottom: 15px;
-            line-height: 1.6;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
         }
 
-        .code-snippet {
-            background: #1e1e1e;
-            color: #e8e8e4;
-            padding: 15px;
+        .code-block {
+            background: var(--background);
+            border: 1px solid var(--border);
             border-radius: 8px;
-            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-            font-size: 13px;
-            line-height: 1.5;
+            padding: 1rem;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.85rem;
+            margin: 1rem 0;
             overflow-x: auto;
-            margin: 10px 0;
-        }
-
-        .line-number {
-            color: #858585;
-            margin-right: 15px;
-            user-select: none;
         }
 
         .suggestion {
-            background: #f0f9ff;
-            border: 1px solid #0ea5e9;
+            background: var(--background);
             border-radius: 8px;
-            padding: 12px;
-            margin-top: 12px;
+            padding: 1rem;
+            margin-top: 1rem;
         }
 
         .suggestion-title {
             font-weight: 600;
-            color: #0ea5e9;
-            margin-bottom: 8px;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
         }
 
-        .tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #e5e7eb;
-        }
-
-        .tab {
-            padding: 10px 20px;
-            cursor: pointer;
-            border-bottom: 2px solid transparent;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-        .tab.active {
-            color: #667eea;
-            border-bottom-color: #667eea;
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 20px;
-        }
-
-        .stat-card {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
+        .no-issues {
             text-align: center;
-            border: 2px solid #e5e7eb;
+            padding: 2rem;
+            color: var(--success-color);
         }
 
-        .stat-number {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #667eea;
+        .no-issues-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
         }
 
-        .stat-label {
-            color: #6b7280;
-            font-size: 14px;
-            margin-top: 5px;
-        }
-        footer {
-            text-align: center;
-            margin-top: 40px;
-            color: #03205a;
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .demo-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .issue-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+
+            .summary-header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
         }
     </style>
 </head>
@@ -333,888 +379,1378 @@
     <div class="container">
         <div class="header">
             <h1>🤖 AI PR Reviewer</h1>
-            <p>Intelligent code review agent with security, performance, and logic analysis</p>
+            <p>Intelligent code analysis for pull requests with security, performance, and logic insights</p>
         </div>
 
         <div class="main-card">
-            <div class="platform-selector">
-                <div class="platform-btn active" data-platform="github">
-                    🐙 GitHub
-                </div>
-                <div class="platform-btn" data-platform="gitlab">
-                    🦊 GitLab
-                </div>
-                <div class="platform-btn" data-platform="cli">
-                    💻 Standalone CLI
+            <!-- Platform Selection -->
+            <div class="platform-tabs">
+                <button class="platform-tab active" data-platform="github">GitHub</button>
+                <button class="platform-tab" data-platform="gitlab">GitLab</button>
+                <button class="platform-tab" data-platform="cli">CLI Tool</button>
+            </div>
+
+            <!-- Demo Examples -->
+            <div class="demo-section">
+                <div class="demo-label">Quick Demo Examples:</div>
+                <div class="demo-grid">
+                    <button class="demo-btn" onclick="loadDemo('security')">
+                        🔒 Security Issues<br>
+                        <small>SQL injection, weak auth</small>
+                    </button>
+                    <button class="demo-btn" onclick="loadDemo('performance')">
+                        ⚡ Performance Issues<br>
+                        <small>N+1 queries, inefficient loops</small>
+                    </button>
+                    <button class="demo-btn" onclick="loadDemo('logic')">
+                        🧠 Logic Errors<br>
+                        <small>Assignment vs comparison</small>
+                    </button>
+                    <button class="demo-btn" onclick="loadDemo('clean')">
+                        ✅ Clean Code<br>
+                        <small>Best practices example</small>
+                    </button>
                 </div>
             </div>
 
-            <div class="input-section">
-                <div class="input-group">
-                    <label for="commit-message">Commit Message / PR Title</label>
-                    <input type="text" id="commit-message" placeholder="e.g., Fix authentication bug in user login flow">
-                </div>
-
-                <div class="input-group">
-                    <label for="pr-description">PR Description (Optional)</label>
-                    <textarea id="pr-description" rows="3" placeholder="Detailed description of changes made..."></textarea>
-                </div>
-
-                <div class="input-group">
-                    <label for="code-changes">Code Changes (Diff Format)</label>
-                    <textarea id="code-changes" class="code-input" placeholder="Paste your code diff here...
-Example:
-@@ -1,4 +1,6 @@
- function authenticateUser(username, password) {
--    return username === 'admin' && password === 'password';
-+    const hashedPassword = hashPassword(password);
-+    return username === 'admin' && hashedPassword === getStoredHash('admin');
- }"></textarea>
-                </div>
-
-                <div class="input-group">
-                    <label for="file-language">Primary Language</label>
-                    <select id="file-language">
-                        <option value="javascript">JavaScript</option>
-                        <option value="python">Python</option>
-                        <option value="java">Java</option>
-                        <option value="csharp">C#</option>
-                        <option value="go">Go</option>
-                        <option value="rust">Rust</option>
-                        <option value="php">PHP</option>
-                        <option value="ruby">Ruby</option>
-                        <option value="other">Other</option>
-                    </select>
-                </div>
-            </div>
-
-            <button class="review-btn" onclick="startReview()">
-                🔍 Start AI Review
-            </button>
-
-            <div class="loading">
-                <div class="spinner"></div>
-                <p>Analyzing code changes and generating intelligent review...</p>
-            </div>
-
-            <div class="results">
-                <div class="summary-card">
-                    <h3>📊 Review Summary</h3>
-                    <div class="stats-grid" id="stats-grid">
-                        <!-- Stats will be inserted here -->
+            <!-- Input Form -->
+            <div class="form-grid">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Commit Message</label>
+                        <textarea id="commitMessage" class="form-textarea" placeholder="Describe your changes (e.g., feat: Add user authentication system)"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Language</label>
+                        <select id="language" class="form-select">
+                            <option value="javascript">JavaScript</option>
+                            <option value="typescript">TypeScript</option>
+                            <option value="python">Python</option>
+                            <option value="java">Java</option>
+                            <option value="csharp">C#</option>
+                            <option value="php">PHP</option>
+                            <option value="ruby">Ruby</option>
+                            <option value="go">Go</option>
+                            <option value="rust">Rust</option>
+                            <option value="kotlin">Kotlin</option>
+                            <option value="swift">Swift</option>
+                            <option value="cpp">C++</option>
+                        </select>
                     </div>
                 </div>
-
-                <div class="tabs">
-                    <div class="tab active" onclick="switchTab('issues')">🚨 Issues Found</div>
-                    <div class="tab" onclick="switchTab('suggestions')">💡 Suggestions</div>
-                    <div class="tab" onclick="switchTab('security')">🔒 Security Analysis</div>
-                    <div class="tab" onclick="switchTab('performance')">⚡ Performance</div>
+                
+                <div class="form-group">
+                    <label class="form-label">Code Changes</label>
+                    <textarea id="codeChanges" class="form-textarea code-textarea" placeholder="Paste your code diff, full code, or modified functions here..."></textarea>
                 </div>
+            </div>
 
-                <div class="tab-content active" id="issues-content">
-                    <!-- Issues will be inserted here -->
-                </div>
+            <button class="analyze-btn" onclick="analyzeCode()">
+                <div class="spinner"></div>
+                <span>Analyze Pull Request</span>
+            </button>
 
-                <div class="tab-content" id="suggestions-content">
-                    <!-- Suggestions will be inserted here -->
-                </div>
-
-                <div class="tab-content" id="security-content">
-                    <!-- Security analysis will be inserted here -->
-                </div>
-
-                <div class="tab-content" id="performance-content">
-                    <!-- Performance analysis will be inserted here -->
-                </div>
+            <!-- Results -->
+            <div class="results" id="results">
+                <div class="summary-card" id="summary"></div>
+                <div class="issues-list" id="issues"></div>
             </div>
         </div>
     </div>
+
     <script>
         let currentPlatform = 'github';
-        let currentTab = 'issues';
 
-        // Platform selection
-        document.querySelectorAll('.platform-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('.platform-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                currentPlatform = btn.dataset.platform;
-                updatePlatformUI();
+        // Platform tabs
+        document.querySelectorAll('.platform-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelector('.platform-tab.active').classList.remove('active');
+                tab.classList.add('active');
+                currentPlatform = tab.dataset.platform;
             });
         });
 
-        function updatePlatformUI() {
-            const commitLabel = document.querySelector('label[for="commit-message"]');
-            const descriptionLabel = document.querySelector('label[for="pr-description"]');
-            const codeLabel = document.querySelector('label[for="code-changes"]');
+        // Enhanced demo data with language-specific examples
+        const demos = {
+            security: {
+                commit: "feat: Add user authentication with session management",
+                code: `// JavaScript - Security Issues Demo
+app.post('/login', (req, res) => {
+    const { username, password } = req.body;
+    
+    // SQL Injection vulnerability
+    const query = \`SELECT * FROM users WHERE username = '\${username}' AND password = '\${password}'\`;
+    
+    db.query(query, (err, results) => {
+        if (results.length > 0) {
+            // Storing sensitive data in session
+            req.session.password = password;
+            req.session.user = results[0];
             
-            switch(currentPlatform) {
-                case 'github':
-                    commitLabel.textContent = 'PR Title / Commit Message';
-                    descriptionLabel.textContent = 'PR Description (Optional)';
-                    codeLabel.textContent = 'Code Changes (GitHub Diff Format)';
-                    document.getElementById('commit-message').placeholder = 'e.g., Fix authentication bug in user login flow';
-                    document.getElementById('pr-description').placeholder = 'Detailed description of changes made...';
-                    break;
-                case 'gitlab':
-                    commitLabel.textContent = 'Merge Request Title';
-                    descriptionLabel.textContent = 'MR Description (Optional)';
-                    codeLabel.textContent = 'Code Changes (GitLab Diff Format)';
-                    document.getElementById('commit-message').placeholder = 'e.g., Resolve authentication vulnerability in login module';
-                    document.getElementById('pr-description').placeholder = 'Merge request description and rationale...';
-                    break;
-                case 'cli':
-                    commitLabel.textContent = 'Commit Message';
-                    descriptionLabel.textContent = 'Change Description (Optional)';
-                    codeLabel.textContent = 'Code Changes (Git Diff Format)';
-                    document.getElementById('commit-message').placeholder = 'e.g., fix: resolve auth vulnerability in login system';
-                    document.getElementById('pr-description').placeholder = 'Additional context for the changes...';
-                    break;
+            // XSS vulnerability
+            document.getElementById('welcome').innerHTML = 'Welcome ' + username;
+            
+            res.json({ success: true, user: results[0] });
+        } else {
+            res.status(401).json({ success: false });
+        }
+    });
+});
+
+// Weak JWT secret
+const token = jwt.sign({ userId: user.id }, 'secret123');
+
+// Code injection risk
+const userCode = req.body.code;
+eval(userCode); // Never do this!`
+            },
+            performance: {
+                commit: "perf: Optimize data loading and processing",
+                code: `// JavaScript - Performance Issues Demo
+async function loadUserDashboard(userId) {
+    // N+1 Query Problem
+    const user = await db.query('SELECT * FROM users WHERE id = ?', [userId]);
+    
+    // Sequential queries in loop
+    for (let post of user.posts) {
+        const postData = await db.query('SELECT * FROM posts WHERE id = ?', [post.id]);
+        post.details = postData;
+        
+        // Nested N+1 problem
+        for (let comment of post.comments) {
+            const commentUser = await db.query('SELECT * FROM users WHERE id = ?', [comment.userId]);
+            comment.user = commentUser;
+        }
+    }
+    
+    // Inefficient string concatenation
+    let html = '';
+    for (let i = 0; i < 1000; i++) {
+        html += '<div>' + data[i] + '</div>';
+    }
+    
+    // Inefficient timeout usage
+    setTimeout(() => {
+        updateCache(user);
+    }, 0);
+    
+    // Object creation in loop
+    for (let i = 0; i < items.length; i++) {
+        const processor = new DataProcessor();
+        results.push(processor.process(items[i]));
+    }
+    
+    return user;
+}`
+            },
+            logic: {
+                commit: "fix: Update validation logic and error handling",
+                code: `// JavaScript - Logic Errors Demo
+function validateUserAccess(user, resource) {
+    // Assignment instead of comparison
+    if (user.role = 'admin') {
+        return true;
+    }
+    
+    // Incorrect operator precedence
+    if (user.active && user.permissions.includes('read') || user.isGuest) {
+        return true;
+    }
+    
+    // Missing return statement
+    if (user.isPremium) {
+        console.log('Premium user detected');
+    }
+    
+    // Redundant boolean comparison
+    if (user.verified === true && resource.public === false) {
+        return false;
+    }
+    
+    // Loose equality causing type coercion
+    if (user.age == "18") {
+        return allowAccess();
+    }
+    
+    // Unreachable code
+    return false;
+    console.log('This will never execute');
+    user.lastAccess = new Date();
+}
+
+// Missing await in async function
+async function processData() {
+    const data = fetchUserData(); // Missing await
+    return data.process();
+}`
+            },
+            clean: {
+                commit: "refactor: Implement secure user service with best practices",
+                code: `// JavaScript - Clean Code Demo
+const bcrypt = require('bcrypt');
+const validator = require('validator');
+const rateLimit = require('express-rate-limit');
+
+class UserService {
+    constructor(database, logger) {
+        this.db = database;
+        this.logger = logger;
+        this.saltRounds = 12;
+    }
+    
+    async createUser(userData) {
+        try {
+            // Input validation with specific error messages
+            const validation = await this.validateUserInput(userData);
+            if (!validation.isValid) {
+                throw new ValidationError(validation.errors);
             }
-        }
-
-        function switchTab(tabName) {
-            // Update tab buttons
-            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
-            document.querySelector(`.tab:nth-child(${getTabIndex(tabName)})`).classList.add('active');
             
-            // Update tab content
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-            document.getElementById(`${tabName}-content`).classList.add('active');
+            // Check for existing user with parameterized query
+            const existingUser = await this.db.query(
+                'SELECT id FROM users WHERE email = ? OR username = ?',
+                [userData.email, userData.username]
+            );
             
-            currentTab = tabName;
+            if (existingUser.length > 0) {
+                throw new ConflictError('User already exists');
+            }
+            
+            // Secure password hashing
+            const hashedPassword = await bcrypt.hash(userData.password, this.saltRounds);
+            
+            // Transaction for data integrity
+            const result = await this.db.transaction(async (trx) => {
+                const user = await trx.query(
+                    'INSERT INTO users (username, email, password_hash, created_at) VALUES (?, ?, ?, ?)',
+                    [userData.username, userData.email, hashedPassword, new Date()]
+                );
+                
+                await trx.query(
+                    'INSERT INTO user_profiles (user_id, display_name) VALUES (?, ?)',
+                    [user.insertId, userData.displayName || userData.username]
+                );
+                
+                return user;
+            });
+            
+            // Proper logging
+            this.logger.info(\`User created successfully: \${userData.username}\`, {
+                userId: result.insertId,
+                timestamp: new Date().toISOString()
+            });
+            
+            // Return sanitized user data
+            return {
+                id: result.insertId,
+                username: userData.username,
+                email: userData.email,
+                createdAt: new Date()
+            };
+            
+        } catch (error) {
+            this.logger.error('User creation failed:', {
+                error: error.message,
+                stack: error.stack,
+                userData: { username: userData.username, email: userData.email }
+            });
+            throw error;
+        }
+    }
+    
+    async validateUserInput(userData) {
+        const errors = [];
+        
+        // Username validation
+        if (!userData.username || userData.username.length < 3) {
+            errors.push('Username must be at least 3 characters long');
+        }
+        
+        if (!/^[a-zA-Z0-9_-]+$/.test(userData.username)) {
+            errors.push('Username can only contain letters, numbers, underscores, and hyphens');
+        }
+        
+        // Email validation
+        if (!validator.isEmail(userData.email)) {
+            errors.push('Please provide a valid email address');
+        }
+        
+        // Password validation
+        if (!this.isValidPassword(userData.password)) {
+            errors.push('Password must be at least 8 characters with uppercase, lowercase, and numbers');
+        }
+        
+        return {
+            isValid: errors.length === 0,
+            errors
+        };
+    }
+    
+    isValidPassword(password) {
+        const minLength = 8;
+        const hasUpperCase = /[A-Z]/.test(password);
+        const hasLowerCase = /[a-z]/.test(password);
+        const hasNumbers = /\d/.test(password);
+        
+        return password.length >= minLength && hasUpperCase && hasLowerCase && hasNumbers;
+    }
+}`
+            }
+        };
+
+        function loadDemo(type) {
+            const demo = demos[type];
+            document.getElementById('commitMessage').value = demo.commit;
+            document.getElementById('codeChanges').value = demo.code;
         }
 
-        function getTabIndex(tabName) {
-            const tabMap = { 'issues': 1, 'suggestions': 2, 'security': 3, 'performance': 4 };
-            return tabMap[tabName] || 1;
-        }
+        function analyzeCode() {
+            const commitMessage = document.getElementById('commitMessage').value.trim();
+            const codeChanges = document.getElementById('codeChanges').value.trim();
+            const language = document.getElementById('language').value;
 
-        function startReview() {
-            const commitMessage = document.getElementById('commit-message').value;
-            const codeChanges = document.getElementById('code-changes').value;
-
-            if (!commitMessage.trim() || !codeChanges.trim()) {
+            if (!commitMessage || !codeChanges) {
                 alert('Please provide both commit message and code changes');
                 return;
             }
 
             // Show loading
-            document.querySelector('.loading').style.display = 'block';
-            document.querySelector('.results').style.display = 'none';
-            document.querySelector('.review-btn').disabled = true;
+            const btn = document.querySelector('.analyze-btn');
+            const spinner = btn.querySelector('.spinner');
+            const span = btn.querySelector('span');
+            
+            btn.disabled = true;
+            spinner.style.display = 'block';
+            span.textContent = 'Analyzing...';
 
-            // Simulate AI analysis
+            // Simulate analysis
             setTimeout(() => {
-                generateReview(commitMessage, codeChanges);
-                document.querySelector('.loading').style.display = 'none';
-                document.querySelector('.results').style.display = 'block';
-                document.querySelector('.review-btn').disabled = false;
-            }, 3000);
+                const analysis = performAnalysis(commitMessage, codeChanges, language);
+                showResults(analysis);
+                
+                // Reset button
+                btn.disabled = false;
+                spinner.style.display = 'none';
+                span.textContent = 'Analyze Pull Request';
+            }, 2500);
         }
 
-        function generateReview(commitMessage, codeChanges) {
-            const language = document.getElementById('file-language').value;
-            const prDescription = document.getElementById('pr-description').value;
-
-            // Analyze the code and generate intelligent feedback
-            const analysis = analyzeCode(commitMessage, codeChanges, language, prDescription);
-            
-            // Update stats
-            updateStats(analysis.stats);
-            
-            // Generate content for each tab
-            generateIssuesContent(analysis.issues);
-            generateSuggestionsContent(analysis.suggestions);
-            generateSecurityContent(analysis.security);
-            generatePerformanceContent(analysis.performance);
-        }
-
-        function analyzeCode(commitMessage, codeChanges, language, description) {
-            // Language-specific and platform-specific analysis
-            const issues = [];
-            const suggestions = [];
-            const security = [];
-            const performance = [];
-
-            // Language-specific patterns and analysis
-            const languagePatterns = getLanguagePatterns(language);
-            const platformSpecificChecks = getPlatformChecks(currentPlatform);
-
-            // Security Analysis - Language Specific
-            languagePatterns.security.forEach(pattern => {
-                if (new RegExp(pattern.regex, 'gi').test(codeChanges)) {
-                    security.push({
-                        severity: pattern.severity,
-                        title: pattern.title,
-                        description: pattern.description,
-                        line: findLineNumber(codeChanges, pattern.searchTerm),
-                        suggestion: pattern.suggestion,
-                        code: extractCodeSnippet(codeChanges, pattern.searchTerm)
-                    });
-                }
-            });
-
-            // Performance Analysis - Language Specific
-            languagePatterns.performance.forEach(pattern => {
-                if (new RegExp(pattern.regex, 'gi').test(codeChanges)) {
-                    performance.push({
-                        severity: pattern.severity,
-                        title: pattern.title,
-                        description: pattern.description,
-                        line: findLineNumber(codeChanges, pattern.searchTerm),
-                        suggestion: pattern.suggestion,
-                        code: extractCodeSnippet(codeChanges, pattern.searchTerm)
-                    });
-                }
-            });
-
-            // General Issues - Language Specific
-            languagePatterns.general.forEach(pattern => {
-                if (new RegExp(pattern.regex, 'gi').test(codeChanges)) {
-                    issues.push({
-                        severity: pattern.severity,
-                        title: pattern.title,
-                        description: pattern.description,
-                        line: findLineNumber(codeChanges, pattern.searchTerm),
-                        suggestion: pattern.suggestion,
-                        code: extractCodeSnippet(codeChanges, pattern.searchTerm)
-                    });
-                }
-            });
-
-            // Platform-specific suggestions
-            platformSpecificChecks.forEach(check => {
-                if (check.condition(commitMessage, description, codeChanges)) {
-                    suggestions.push(check.suggestion);
-                }
-            });
-
-            // Language-specific suggestions based on commit message
-            if (commitMessage.toLowerCase().includes('fix') || commitMessage.toLowerCase().includes('bug')) {
-                suggestions.push({
-                    title: `Add ${getTestFramework(language)} Tests`,
-                    description: `Since this is a bug fix, consider adding ${getTestFramework(language)} unit tests to prevent regression.`,
-                    priority: 'high'
-                });
-            }
-
-            if (commitMessage.toLowerCase().includes('performance')) {
-                suggestions.push({
-                    title: 'Add Performance Benchmarks',
-                    description: `Consider adding ${getBenchmarkTool(language)} benchmark tests to measure performance improvements.`,
-                    priority: 'medium'
-                });
-            }
-
-            // Check for missing documentation
-            if (language !== 'javascript' && !codeChanges.includes('/**') && !codeChanges.includes('///') && !codeChanges.includes('#')) {
-                suggestions.push({
-                    title: 'Add Documentation',
-                    description: `Consider adding ${getDocStyle(language)} documentation for new functions and classes.`,
-                    priority: 'medium'
-                });
-            }
-
-            const stats = {
-                totalIssues: issues.length + security.length,
-                critical: security.filter(s => s.severity === 'critical').length,
-                high: [...issues, ...security].filter(s => s.severity === 'high').length,
-                medium: [...issues, ...security, ...performance].filter(s => s.severity === 'medium').length,
-                low: issues.filter(s => s.severity === 'low').length,
-                suggestions: suggestions.length
-            };
-
-            return { issues, suggestions, security, performance, stats };
-        }
-
-        function getLanguagePatterns(language) {
-            const patterns = {
-                javascript: {
-                    security: [
-                        {
-                            regex: 'eval\\s*\\(',
-                            searchTerm: 'eval',
-                            severity: 'critical',
-                            title: 'Dangerous eval() Usage',
-                            description: 'Using eval() can lead to code injection vulnerabilities.',
-                            suggestion: 'Use JSON.parse() for data parsing or refactor to avoid eval().'
-                        },
-                        {
-                            regex: 'innerHTML\\s*=.*\\+',
-                            searchTerm: 'innerHTML',
-                            severity: 'high',
-                            title: 'XSS Vulnerability - innerHTML',
-                            description: 'Direct innerHTML assignment with concatenation can lead to XSS attacks.',
-                            suggestion: 'Use textContent or properly sanitize HTML content.'
-                        },
-                        {
-                            regex: 'document\\.cookie',
-                            searchTerm: 'document.cookie',
-                            severity: 'medium',
-                            title: 'Insecure Cookie Handling',
-                            description: 'Direct cookie manipulation detected.',
-                            suggestion: 'Use secure cookie libraries and set httpOnly, secure flags.'
-                        }
-                    ],
-                    performance: [
-                        {
-                            regex: 'for\\s*\\(.*\\.length',
-                            searchTerm: 'for',
-                            severity: 'medium',
-                            title: 'Loop Performance Issue',
-                            description: 'Accessing .length property in loop condition can be optimized.',
-                            suggestion: 'Cache the length value before the loop: const len = arr.length;'
-                        },
-                        {
-                            regex: 'getElementById.*loop|for.*getElementById',
-                            searchTerm: 'getElementById',
-                            severity: 'medium',
-                            title: 'DOM Query in Loop',
-                            description: 'DOM queries inside loops are expensive.',
-                            suggestion: 'Cache DOM elements outside the loop.'
-                        }
-                    ],
-                    general: [
-                        {
-                            regex: 'console\\.(log|warn|error)',
-                            searchTerm: 'console.',
-                            severity: 'low',
-                            title: 'Debug Code Left in Production',
-                            description: 'Console statements found in the code.',
-                            suggestion: 'Remove console statements or use a proper logging framework.'
-                        },
-                        {
-                            regex: 'var\\s+',
-                            searchTerm: 'var ',
-                            severity: 'low',
-                            title: 'Use Modern Variable Declaration',
-                            description: 'Using var instead of let/const.',
-                            suggestion: 'Use let or const for better scope control and immutability.'
-                        }
-                    ]
-                },
-                python: {
-                    security: [
-                        {
-                            regex: 'exec\\s*\\(',
-                            searchTerm: 'exec',
-                            severity: 'critical',
-                            title: 'Dangerous exec() Usage',
-                            description: 'Using exec() can lead to code injection vulnerabilities.',
-                            suggestion: 'Avoid exec() or use safer alternatives like ast.literal_eval().'
-                        },
-                        {
-                            regex: 'input\\(.*\\).*exec|eval',
-                            searchTerm: 'input',
-                            severity: 'critical',
-                            title: 'Code Injection via Input',
-                            description: 'User input being executed as code.',
-                            suggestion: 'Never execute user input directly. Validate and sanitize all inputs.'
-                        },
-                        {
-                            regex: 'pickle\\.loads?\\(',
-                            searchTerm: 'pickle',
-                            severity: 'high',
-                            title: 'Unsafe Deserialization',
-                            description: 'Pickle deserialization can execute arbitrary code.',
-                            suggestion: 'Use JSON for data serialization or validate pickle sources.'
-                        }
-                    ],
-                    performance: [
-                        {
-                            regex: '\\+.*join|join.*\\+',
-                            searchTerm: 'join',
-                            severity: 'medium',
-                            title: 'Inefficient String Concatenation',
-                            description: 'String concatenation in loops is inefficient.',
-                            suggestion: 'Use join() for multiple string concatenations: "".join(strings)'
-                        },
-                        {
-                            regex: 'for.*in.*range\\(len\\(',
-                            searchTerm: 'range(len(',
-                            severity: 'low',
-                            title: 'Non-Pythonic Loop',
-                            description: 'Using range(len()) instead of direct iteration.',
-                            suggestion: 'Use direct iteration: for item in list: or enumerate() if index needed.'
-                        }
-                    ],
-                    general: [
-                        {
-                            regex: 'print\\s*\\(',
-                            searchTerm: 'print(',
-                            severity: 'low',
-                            title: 'Debug Print Statements',
-                            description: 'Print statements found in the code.',
-                            suggestion: 'Use logging module instead of print for production code.'
-                        },
-                        {
-                            regex: 'except\\s*:',
-                            searchTerm: 'except:',
-                            severity: 'medium',
-                            title: 'Bare Except Clause',
-                            description: 'Bare except clause catches all exceptions including system exit.',
-                            suggestion: 'Catch specific exceptions: except ValueError: or except Exception:'
-                        }
-                    ]
-                },
-                java: {
-                    security: [
-                        {
-                            regex: 'Runtime\\.getRuntime\\(\\)\\.exec',
-                            searchTerm: 'Runtime.getRuntime().exec',
-                            severity: 'critical',
-                            title: 'Command Injection Risk',
-                            description: 'Direct command execution can lead to command injection.',
-                            suggestion: 'Use ProcessBuilder with validated inputs or avoid system commands.'
-                        },
-                        {
-                            regex: 'String.*password.*=',
-                            searchTerm: 'password',
-                            severity: 'high',
-                            title: 'Password in String',
-                            description: 'Storing passwords in String objects is insecure.',
-                            suggestion: 'Use char[] for passwords and clear after use.'
-                        }
-                    ],
-                    performance: [
-                        {
-                            regex: 'String.*\\+.*loop|for.*String.*\\+',
-                            searchTerm: 'String',
-                            severity: 'medium',
-                            title: 'Inefficient String Concatenation',
-                            description: 'String concatenation in loops creates many objects.',
-                            suggestion: 'Use StringBuilder for multiple string concatenations.'
-                        },
-                        {
-                            regex: 'new.*ArrayList\\(\\).*for',
-                            searchTerm: 'new ArrayList()',
-                            severity: 'low',
-                            title: 'ArrayList Size Optimization',
-                            description: 'ArrayList without initial capacity may resize multiple times.',
-                            suggestion: 'Specify initial capacity if size is known: new ArrayList<>(expectedSize)'
-                        }
-                    ],
-                    general: [
-                        {
-                            regex: 'System\\.out\\.print',
-                            searchTerm: 'System.out.print',
-                            severity: 'low',
-                            title: 'Debug Print Statements',
-                            description: 'System.out.print statements found in code.',
-                            suggestion: 'Use proper logging framework like SLF4J or java.util.logging.'
-                        },
-                        {
-                            regex: 'catch\\s*\\(\\s*Exception',
-                            searchTerm: 'catch (Exception',
-                            severity: 'medium',
-                            title: 'Catching Generic Exception',
-                            description: 'Catching generic Exception hides specific error handling.',
-                            suggestion: 'Catch specific exceptions for better error handling.'
-                        }
-                    ]
-                }
-            };
-
-            // Return JavaScript patterns as default for other languages
-            return patterns[language] || patterns.javascript;
-        }
-
-        function getPlatformChecks(platform) {
-            const checks = {
-                github: [
+        // Language-specific analysis patterns
+        const languagePatterns = {
+            javascript: {
+                security: [
                     {
-                        condition: (commit, desc, code) => commit.startsWith('fix:') || commit.startsWith('feat:'),
-                        suggestion: {
-                            title: 'Conventional Commits Detected',
-                            description: 'Great! You\'re using conventional commit format. Consider adding breaking change info if applicable.',
-                            priority: 'info'
-                        }
+                        pattern: /SELECT.*FROM.*WHERE.*\$\{.*\}/gi,
+                        severity: 'critical',
+                        title: 'SQL Injection Vulnerability',
+                        description: 'String interpolation in SQL queries allows injection attacks.',
+                        suggestion: 'Use parameterized queries with placeholders (?, $1, etc.)',
+                        score: -25
                     },
                     {
-                        condition: (commit, desc, code) => desc.length < 50 && code.split('\n').length > 20,
-                        suggestion: {
-                            title: 'Add Detailed PR Description',
-                            description: 'Large code changes should have detailed PR descriptions for better review.',
-                            priority: 'medium'
-                        }
+                        pattern: /innerHTML\s*=.*\+|innerHTML\s*=.*\$\{/gi,
+                        severity: 'high',
+                        title: 'XSS Vulnerability',
+                        description: 'Dynamic innerHTML assignment can lead to cross-site scripting.',
+                        suggestion: 'Use textContent, createElement, or sanitize HTML input.',
+                        score: -20
                     },
                     {
-                        condition: (commit, desc, code) => !desc.includes('closes') && !desc.includes('fixes'),
-                        suggestion: {
-                            title: 'Link Related Issues',
-                            description: 'Consider linking related GitHub issues using "fixes #123" or "closes #123".',
-                            priority: 'low'
-                        }
+                        pattern: /eval\s*\(/gi,
+                        severity: 'critical',
+                        title: 'Code Injection Risk',
+                        description: 'eval() can execute arbitrary code and is a major security risk.',
+                        suggestion: 'Avoid eval(). Use JSON.parse() for data or specific parsing methods.',
+                        score: -30
                     }
                 ],
-                gitlab: [
+                performance: [
                     {
-                        condition: (commit, desc, code) => !desc.includes('See merge request'),
-                        suggestion: {
-                            title: 'GitLab MR Best Practices',
-                            description: 'Consider adding related issue links and milestone information.',
-                            priority: 'low'
-                        }
+                        pattern: /for.*\{[^}]*await.*query/gi,
+                        severity: 'high',
+                        title: 'N+1 Query Problem',
+                        description: 'Database queries inside loops cause performance bottlenecks.',
+                        suggestion: 'Use JOIN queries or batch operations to reduce database calls.',
+                        score: -20
                     },
                     {
-                        condition: (commit, desc, code) => code.includes('TODO') || code.includes('FIXME'),
-                        suggestion: {
-                            title: 'Create GitLab Issues for TODOs',
-                            description: 'Convert TODO/FIXME comments into GitLab issues for better tracking.',
-                            priority: 'medium'
-                        }
+                        pattern: /setTimeout.*0\)/gi,
+                        severity: 'medium',
+                        title: 'Inefficient Async Pattern',
+                        description: 'setTimeout(..., 0) is an anti-pattern for async operations.',
+                        suggestion: 'Use Promise.resolve().then() or proper async/await patterns.',
+                        score: -8
                     }
                 ],
-                cli: [
+                logic: [
                     {
-                        condition: (commit, desc, code) => !commit.includes(':'),
-                        suggestion: {
-                            title: 'Use Conventional Commits',
-                            description: 'Consider using conventional commit format: type(scope): description',
-                            priority: 'low'
-                        }
+                        pattern: /if\s*\([^)]*=\s*[^=]/gi,
+                        severity: 'critical',
+                        title: 'Assignment in Condition',
+                        description: 'Assignment operator (=) used instead of comparison (===).',
+                        suggestion: 'Use === for strict equality or == for loose equality.',
+                        score: -25
                     },
                     {
-                        condition: (commit, desc, code) => code.split('\n').length > 50,
-                        suggestion: {
-                            title: 'Consider Breaking Down Changes',
-                            description: 'Large commits are harder to review. Consider breaking into smaller, focused commits.',
-                            priority: 'medium'
-                        }
+                        pattern: /[^=!]==[^=]/gi,
+                        severity: 'medium',
+                        title: 'Loose Equality Comparison',
+                        description: 'Using == can cause unexpected type coercion.',
+                        suggestion: 'Use === for strict equality comparison.',
+                        score: -8
+                    }
+                ],
+                quality: [
+                    {
+                        pattern: /\bvar\s+/gi,
+                        severity: 'low',
+                        title: 'Legacy Variable Declaration',
+                        description: 'Using var can cause scope-related issues.',
+                        suggestion: 'Use const for constants and let for mutable variables.',
+                        score: -3
+                    },
+                    {
+                        pattern: /const\s+\w+|let\s+\w+/gi,
+                        severity: 'low',
+                        title: 'Modern Variable Declarations',
+                        description: 'Good use of modern const/let declarations.',
+                        suggestion: 'Excellent! Continue using const and let.',
+                        score: 3,
+                        positive: true
                     }
                 ]
-            };
-
-            return checks[platform] || checks.github;
-        }
-
-        function getTestFramework(language) {
-            const frameworks = {
-                javascript: 'Jest/Mocha',
-                python: 'pytest/unittest',
-                java: 'JUnit',
-                csharp: 'NUnit/xUnit',
-                go: 'testing package',
-                rust: 'built-in test',
-                php: 'PHPUnit',
-                ruby: 'RSpec/Minitest'
-            };
-            return frameworks[language] || 'unit testing framework';
-        }
-
-        function getBenchmarkTool(language) {
-            const tools = {
-                javascript: 'Benchmark.js',
-                python: 'timeit/pytest-benchmark',
-                java: 'JMH (Java Microbenchmark Harness)',
-                csharp: 'BenchmarkDotNet',
-                go: 'testing.B',
-                rust: 'criterion',
-                php: 'PHPBench',
-                ruby: 'benchmark-ips'
-            };
-            return tools[language] || 'benchmarking tools';
-        }
-
-        function getDocStyle(language) {
-            const styles = {
-                javascript: 'JSDoc',
-                python: 'docstring',
-                java: 'Javadoc',
-                csharp: 'XML documentation',
-                go: 'Go doc comments',
-                rust: 'rustdoc',
-                php: 'PHPDoc',
-                ruby: 'YARD'
-            };
-            return styles[language] || 'inline';
-        }
-
-        function findLineNumber(code, searchTerm) {
-            const lines = code.split('\n');
-            for (let i = 0; i < lines.length; i++) {
-                if (lines[i].includes(searchTerm)) {
-                    return i + 1;
-                }
+            },
+            python: {
+                security: [
+                    {
+                        pattern: /f".*SELECT.*FROM.*\{.*\}"/gi,
+                        severity: 'critical',
+                        title: 'SQL Injection Vulnerability',
+                        description: 'F-string formatting in SQL queries allows injection attacks.',
+                        suggestion: 'Use parameterized queries with cursor.execute(sql, params).',
+                        score: -25
+                    },
+                    {
+                        pattern: /exec\s*\(|eval\s*\(/gi,
+                        severity: 'critical',
+                        title: 'Code Injection Risk',
+                        description: 'exec() and eval() can execute arbitrary code.',
+                        suggestion: 'Avoid exec/eval. Use ast.literal_eval for safe evaluation.',
+                        score: -30
+                    },
+                    {
+                        pattern: /pickle\.loads?\(.*input/gi,
+                        severity: 'high',
+                        title: 'Unsafe Deserialization',
+                        description: 'Pickle can execute arbitrary code during deserialization.',
+                        suggestion: 'Use JSON or implement custom serialization for untrusted data.',
+                        score: -20
+                    }
+                ],
+                performance: [
+                    {
+                        pattern: /for\s+\w+\s+in.*:\s*\n.*\.execute\(/gi,
+                        severity: 'high',
+                        title: 'Database Queries in Loop',
+                        description: 'Multiple database queries in loops cause performance issues.',
+                        suggestion: 'Use bulk operations or JOIN queries.',
+                        score: -20
+                    },
+                    {
+                        pattern: /\+\s*=.*\[.*\]/gi,
+                        severity: 'medium',
+                        title: 'Inefficient List Concatenation',
+                        description: 'Using += for list concatenation is inefficient.',
+                        suggestion: 'Use list.extend() or list comprehension.',
+                        score: -8
+                    }
+                ],
+                logic: [
+                    {
+                        pattern: /except\s*:/gi,
+                        severity: 'medium',
+                        title: 'Bare Except Clause',
+                        description: 'Catching all exceptions can hide important errors.',
+                        suggestion: 'Catch specific exception types: except ValueError, TypeError:',
+                        score: -10
+                    },
+                    {
+                        pattern: /is\s+(True|False)|==\s*(True|False)/gi,
+                        severity: 'low',
+                        title: 'Redundant Boolean Comparison',
+                        description: 'Comparing with True/False is unnecessary.',
+                        suggestion: 'Use the boolean value directly: if condition:',
+                        score: -5
+                    }
+                ],
+                quality: [
+                    {
+                        pattern: /global\s+\w+/gi,
+                        severity: 'low',
+                        title: 'Global Variable Usage',
+                        description: 'Global variables can make code harder to test and maintain.',
+                        suggestion: 'Consider passing variables as parameters or using class attributes.',
+                        score: -5
+                    },
+                    {
+                        pattern: /with\s+open\(|contextlib\./gi,
+                        severity: 'low',
+                        title: 'Proper Resource Management',
+                        description: 'Good use of context managers for resource handling.',
+                        suggestion: 'Excellent! Context managers ensure proper cleanup.',
+                        score: 5,
+                        positive: true
+                    }
+                ]
+            },
+            java: {
+                security: [
+                    {
+                        pattern: /Statement.*executeQuery.*\+/gi,
+                        severity: 'critical',
+                        title: 'SQL Injection Vulnerability',
+                        description: 'String concatenation in SQL queries allows injection attacks.',
+                        suggestion: 'Use PreparedStatement with parameterized queries.',
+                        score: -25
+                    },
+                    {
+                        pattern: /Runtime\.getRuntime\(\)\.exec/gi,
+                        severity: 'critical',
+                        title: 'Command Injection Risk',
+                        description: 'Executing system commands can be exploited.',
+                        suggestion: 'Validate and sanitize all inputs, use ProcessBuilder.',
+                        score: -30
+                    }
+                ],
+                performance: [
+                    {
+                        pattern: /for.*\{.*new\s+\w+\(/gi,
+                        severity: 'medium',
+                        title: 'Object Creation in Loop',
+                        description: 'Creating objects repeatedly in loops affects performance.',
+                        suggestion: 'Move object creation outside the loop or use object pooling.',
+                        score: -10
+                    },
+                    {
+                        pattern: /String.*\+.*\+/gi,
+                        severity: 'medium',
+                        title: 'Inefficient String Concatenation',
+                        description: 'String concatenation creates multiple temporary objects.',
+                        suggestion: 'Use StringBuilder for multiple concatenations.',
+                        score: -8
+                    }
+                ],
+                logic: [
+                    {
+                        pattern: /if\s*\([^)]*=\s*[^=]/gi,
+                        severity: 'critical',
+                        title: 'Assignment in Condition',
+                        description: 'Assignment operator (=) used instead of comparison (==).',
+                        suggestion: 'Use == for comparison or .equals() for objects.',
+                        score: -25
+                    },
+                    {
+                        pattern: /==.*String|String.*==/gi,
+                        severity: 'high',
+                        title: 'String Comparison with ==',
+                        description: 'Using == for string comparison checks reference, not value.',
+                        suggestion: 'Use .equals() or .compareTo() for string comparison.',
+                        score: -15
+                    }
+                ],
+                quality: [
+                    {
+                        pattern: /System\.out\.print/gi,
+                        severity: 'low',
+                        title: 'Console Output in Production Code',
+                        description: 'System.out should not be used in production code.',
+                        suggestion: 'Use proper logging framework like SLF4J or Log4j.',
+                        score: -3
+                    },
+                    {
+                        pattern: /private\s+final\s+|final\s+class/gi,
+                        severity: 'low',
+                        title: 'Proper Encapsulation',
+                        description: 'Good use of final and private modifiers.',
+                        suggestion: 'Excellent! Proper encapsulation improves code quality.',
+                        score: 3,
+                        positive: true
+                    }
+                ]
+            },
+            csharp: {
+                security: [
+                    {
+                        pattern: /SqlCommand.*CommandText.*\+/gi,
+                        severity: 'critical',
+                        title: 'SQL Injection Vulnerability',
+                        description: 'String concatenation in SQL commands allows injection attacks.',
+                        suggestion: 'Use parameterized queries with SqlParameter.',
+                        score: -25
+                    },
+                    {
+                        pattern: /Process\.Start.*input/gi,
+                        severity: 'high',
+                        title: 'Command Injection Risk',
+                        description: 'Starting processes with user input can be dangerous.',
+                        suggestion: 'Validate and sanitize all inputs before executing.',
+                        score: -20
+                    }
+                ],
+                performance: [
+                    {
+                        pattern: /for.*\{.*new\s+\w+\(/gi,
+                        severity: 'medium',
+                        title: 'Object Allocation in Loop',
+                        description: 'Frequent object creation can cause GC pressure.',
+                        suggestion: 'Reuse objects or use object pooling patterns.',
+                        score: -10
+                    },
+                    {
+                        pattern: /string.*\+.*\+/gi,
+                        severity: 'medium',
+                        title: 'Inefficient String Concatenation',
+                        description: 'String concatenation creates multiple temporary objects.',
+                        suggestion: 'Use StringBuilder or string interpolation ($"").',
+                        score: -8
+                    }
+                ],
+                logic: [
+                    {
+                        pattern: /if\s*\([^)]*=\s*[^=]/gi,
+                        severity: 'critical',
+                        title: 'Assignment in Condition',
+                        description: 'Assignment operator (=) used instead of comparison (==).',
+                        suggestion: 'Use == for comparison or .Equals() for objects.',
+                        score: -25
+                    }
+                ],
+                quality: [
+                    {
+                        pattern: /Console\.Write/gi,
+                        severity: 'low',
+                        title: 'Console Output in Production',
+                        description: 'Console output should not be used in production code.',
+                        suggestion: 'Use ILogger or other logging frameworks.',
+                        score: -3
+                    },
+                    {
+                        pattern: /using\s*\(.*\)|await\s+using/gi,
+                        severity: 'low',
+                        title: 'Proper Resource Disposal',
+                        description: 'Good use of using statements for resource management.',
+                        suggestion: 'Excellent! Using statements ensure proper disposal.',
+                        score: 5,
+                        positive: true
+                    }
+                ]
+            },
+            php: {
+                security: [
+                    {
+                        pattern: /mysql_query.*\$|mysqli_query.*\$_/gi,
+                        severity: 'critical',
+                        title: 'SQL Injection Vulnerability',
+                        description: 'Direct variable interpolation in SQL queries is dangerous.',
+                        suggestion: 'Use prepared statements with PDO or mysqli.',
+                        score: -25
+                    },
+                    {
+                        pattern: /eval\s*\(|\$\$|extract\s*\(/gi,
+                        severity: 'critical',
+                        title: 'Code Injection Risk',
+                        description: 'eval(), variable variables, and extract() are dangerous.',
+                        suggestion: 'Avoid eval() and variable variables. Sanitize extract() input.',
+                        score: -30
+                    }
+                ],
+                performance: [
+                    {
+                        pattern: /for.*\{.*mysql_query/gi,
+                        severity: 'high',
+                        title: 'Database Queries in Loop',
+                        description: 'Multiple database queries in loops cause performance issues.',
+                        suggestion: 'Use JOINs or prepare statements outside loops.',
+                        score: -20
+                    }
+                ],
+                logic: [
+                    {
+                        pattern: /if\s*\([^)]*=\s*[^=]/gi,
+                        severity: 'critical',
+                        title: 'Assignment in Condition',
+                        description: 'Assignment operator (=) used instead of comparison (==).',
+                        suggestion: 'Use == for comparison or === for strict comparison.',
+                        score: -25
+                    }
+                ],
+                quality: [
+                    {
+                        pattern: /\<\?php|\<\?=|\<\?/gi,
+                        severity: 'low',
+                        title: 'PHP Tag Usage',
+                        description: 'Using proper PHP opening tags.',
+                        suggestion: 'Always use <?php instead of short tags.',
+                        score: 2,
+                        positive: true
+                    }
+                ]
+            },
+            ruby: {
+                security: [
+                    {
+                        pattern: /ActiveRecord.*find_by_sql.*\#\{/gi,
+                        severity: 'critical',
+                        title: 'SQL Injection Vulnerability',
+                        description: 'String interpolation in SQL queries allows injection attacks.',
+                        suggestion: 'Use parameterized queries or ActiveRecord methods.',
+                        score: -25
+                    },
+                    {
+                        pattern: /eval\s*\(|instance_eval/gi,
+                        severity: 'high',
+                        title: 'Code Injection Risk',
+                        description: 'eval() and instance_eval() can execute arbitrary code.',
+                        suggestion: 'Avoid eval methods. Use send() with symbol validation.',
+                        score: -25
+                    }
+                ],
+                performance: [
+                    {
+                        pattern: /\.times\s*\{.*find\(/gi,
+                        severity: 'high',
+                        title: 'N+1 Query Problem',
+                        description: 'Database queries inside iteration blocks cause performance issues.',
+                        suggestion: 'Use includes(), joins(), or preload() for eager loading.',
+                        score: -20
+                    }
+                ],
+                logic: [
+                    {
+                        pattern: /if\s+\w+\s*=\s*[^=]/gi,
+                        severity: 'medium',
+                        title: 'Assignment in Condition',
+                        description: 'Assignment in conditional might be unintentional.',
+                        suggestion: 'Use == for comparison or wrap assignment in parentheses.',
+                        score: -15
+                    }
+                ],
+                quality: [
+                    {
+                        pattern: /def\s+\w+.*\n.*rescue\s*$/gi,
+                        severity: 'low',
+                        title: 'Bare Rescue Clause',
+                        description: 'Bare rescue catches all exceptions, including system errors.',
+                        suggestion: 'Rescue specific exception types: rescue StandardError.',
+                        score: -5
+                    }
+                ]
+            },
+            go: {
+                security: [
+                    {
+                        pattern: /fmt\.Sprintf.*SELECT.*%/gi,
+                        severity: 'critical',
+                        title: 'SQL Injection Vulnerability',
+                        description: 'String formatting in SQL queries allows injection attacks.',
+                        suggestion: 'Use parameterized queries with database/sql package.',
+                        score: -25
+                    },
+                    {
+                        pattern: /exec\.Command.*input/gi,
+                        severity: 'high',
+                        title: 'Command Injection Risk',
+                        description: 'Executing commands with user input can be dangerous.',
+                        suggestion: 'Validate and sanitize all inputs before executing.',
+                        score: -20
+                    }
+                ],
+                performance: [
+                    {
+                        pattern: /for.*range.*\{.*Query\(/gi,
+                        severity: 'high',
+                        title: 'Database Queries in Loop',
+                        description: 'Multiple database queries in loops cause performance issues.',
+                        suggestion: 'Use batch operations or single queries with JOINs.',
+                        score: -20
+                    }
+                ],
+                logic: [
+                    {
+                        pattern: /if\s+\w+\s*:=.*;.*err\s*!=\s*nil/gi,
+                        severity: 'low',
+                        title: 'Proper Error Handling',
+                        description: 'Good Go error handling pattern.',
+                        suggestion: 'Excellent! Continue checking errors explicitly.',
+                        score: 5,
+                        positive: true
+                    }
+                ],
+                quality: [
+                    {
+                        pattern: /fmt\.Print/gi,
+                        severity: 'low',
+                        title: 'Print Statements in Code',
+                        description: 'Print statements should not be in production code.',
+                        suggestion: 'Use proper logging package like logrus or zap.',
+                        score: -3
+                    }
+                ]
+            },
+            rust: {
+                security: [
+                    {
+                        pattern: /unsafe\s*\{/gi,
+                        severity: 'high',
+                        title: 'Unsafe Code Block',
+                        description: 'Unsafe blocks bypass Rust\'s memory safety guarantees.',
+                        suggestion: 'Minimize unsafe code and document safety invariants.',
+                        score: -15
+                    }
+                ],
+                performance: [
+                    {
+                        pattern: /\.clone\(\).*\.clone\(\)/gi,
+                        severity: 'medium',
+                        title: 'Excessive Cloning',
+                        description: 'Multiple clones can impact performance unnecessarily.',
+                        suggestion: 'Use borrowing (&) instead of cloning when possible.',
+                        score: -8
+                    }
+                ],
+                logic: [
+                    {
+                        pattern: /unwrap\(\)/gi,
+                        severity: 'medium',
+                        title: 'Potential Panic with unwrap()',
+                        description: 'unwrap() can cause panics if the value is None or Err.',
+                        suggestion: 'Use match, if let, or expect() with descriptive messages.',
+                        score: -10
+                    }
+                ],
+                quality: [
+                    {
+                        pattern: /\?;|match.*\{.*Ok\(.*\).*Err\(.*\)/gi,
+                        severity: 'low',
+                        title: 'Proper Error Handling',
+                        description: 'Good use of Rust error handling patterns.',
+                        suggestion: 'Excellent! Proper error propagation and handling.',
+                        score: 5,
+                        positive: true
+                    }
+                ]
             }
-            return 1;
-        }
+        };
 
-        function extractCodeSnippet(code, searchTerm) {
-            const lines = code.split('\n');
-            for (let i = 0; i < lines.length; i++) {
-                if (lines[i].includes(searchTerm)) {
-                    const start = Math.max(0, i - 2);
-                    const end = Math.min(lines.length, i + 3);
-                    return lines.slice(start, end).map((line, idx) => 
-                        `${start + idx + 1}: ${line}`
-                    ).join('\n');
+        function performAnalysis(commit, code, language) {
+            const issues = [];
+            let score = 85;
+
+            // Get language-specific patterns
+            const patterns = languagePatterns[language] || languagePatterns.javascript;
+
+            // Apply all pattern categories
+            ['security', 'performance', 'logic', 'quality'].forEach(category => {
+                if (patterns[category]) {
+                    patterns[category].forEach(pattern => {
+                        const matches = [...code.matchAll(pattern.pattern)];
+                        
+                        matches.forEach(match => {
+                            const lineNum = getLineNumber(code, pattern.pattern);
+                            const codeSnippet = extractCodeSnippet(code, match[0]);
+                            
+                            issues.push({
+                                type: category.charAt(0).toUpperCase() + category.slice(1),
+                                severity: pattern.severity,
+                                title: pattern.title,
+                                description: pattern.description,
+                                line: lineNum,
+                                suggestion: pattern.suggestion,
+                                code: codeSnippet,
+                                positive: pattern.positive || false
+                            });
+
+                            score += pattern.score;
+                        });
+                    });
                 }
+            });
+
+            // Add complexity analysis
+            const complexity = analyzeComplexity(code);
+            score += complexity.score;
+            if (complexity.issues.length > 0) {
+                issues.push(...complexity.issues);
             }
-            return code.split('\n').slice(0, 5).map((line, idx) => `${idx + 1}: ${line}`).join('\n');
+
+            // Language-specific enhancements
+            const langAnalysis = getLanguageSpecificAnalysis(code, language);
+            score += langAnalysis.scoreAdjustment;
+            issues.push(...langAnalysis.issues);
+
+            return {
+                score: Math.max(0, Math.min(100, score)),
+                issues: issues.sort((a, b) => getSeverityWeight(b.severity) - getSeverityWeight(a.severity)),
+                language,
+                platform: currentPlatform
+            };
         }
 
-        function updateStats(stats) {
-            const statsGrid = document.getElementById('stats-grid');
-            statsGrid.innerHTML = `
-                <div class="stat-card">
-                    <div class="stat-number">${stats.totalIssues}</div>
-                    <div class="stat-label">Total Issues</div>
+        function extractCodeSnippet(code, matchText) {
+            if (matchText.length > 80) {
+                return matchText.substring(0, 77) + '...';
+            }
+            return matchText;
+        }
+
+        function analyzeComplexity(code) {
+            const issues = [];
+            let score = 0;
+            
+            // Count cyclomatic complexity
+            const complexityPatterns = [
+                /\bif\s*\(/gi, /\belse\s*if\s*\(/gi, /\bwhile\s*\(/gi, 
+                /\bfor\s*\(/gi, /\bswitch\s*\(/gi, /\bcase\s+.*:/gi,
+                /\bcatch\s*\(/gi, /&&|\|\|/gi
+            ];
+            
+            let totalComplexity = 1; // Base complexity
+            complexityPatterns.forEach(pattern => {
+                const matches = code.match(pattern);
+                if (matches) totalComplexity += matches.length;
+            });
+
+            // Analyze function length
+            const lines = code.split('\n').filter(line => line.trim().length > 0);
+            
+            if (totalComplexity > 15) {
+                issues.push({
+                    type: 'Quality',
+                    severity: 'high',
+                    title: 'High Cyclomatic Complexity',
+                    description: `Function has cyclomatic complexity of ${totalComplexity} (threshold: 10).`,
+                    line: 1,
+                    suggestion: 'Break down into smaller, focused functions.',
+                    code: `Complexity: ${totalComplexity}`
+                });
+                score -= 15;
+            } else if (totalComplexity > 10) {
+                issues.push({
+                    type: 'Quality',
+                    severity: 'medium',
+                    title: 'Moderate Complexity',
+                    description: `Function complexity is ${totalComplexity}. Consider refactoring.`,
+                    line: 1,
+                    suggestion: 'Consider breaking into smaller functions.',
+                    code: `Complexity: ${totalComplexity}`
+                });
+                score -= 8;
+            }
+
+            if (lines.length > 100) {
+                issues.push({
+                    type: 'Quality',
+                    severity: 'medium',
+                    title: 'Very Long Function',
+                    description: `Function has ${lines.length} lines (threshold: 50).`,
+                    line: 1,
+                    suggestion: 'Break into smaller, focused functions.',
+                    code: `${lines.length} lines of code`
+                });
+                score -= 12;
+            } else if (lines.length > 50) {
+                issues.push({
+                    type: 'Quality',
+                    severity: 'low',
+                    title: 'Long Function',
+                    description: `Function has ${lines.length} lines. Consider refactoring.`,
+                    line: 1,
+                    suggestion: 'Consider breaking into smaller functions.',
+                    code: `${lines.length} lines of code`
+                });
+                score -= 5;
+            }
+
+            return { issues, score };
+        }
+
+        function getLanguageSpecificAnalysis(code, language) {
+            const issues = [];
+            let scoreAdjustment = 0;
+
+            // Additional language-specific checks
+            switch (language) {
+                case 'javascript':
+                case 'typescript':
+                    // Check for console statements
+                    if (/console\.(log|error|warn|info)/gi.test(code)) {
+                        issues.push({
+                            type: 'Quality',
+                            severity: 'low',
+                            title: 'Debug Console Statements',
+                            description: 'Console statements should be removed from production code.',
+                            line: getLineNumber(code, /console\./gi),
+                            suggestion: 'Use proper logging library or remove debug statements.',
+                            code: code.match(/console\.[^;]*/gi)?.[0] || 'Console statement'
+                        });
+                        scoreAdjustment -= 2;
+                    }
+
+                    // Check for proper async/await usage
+                    if (/async.*function.*\{[^}]*(?!await)[^}]*Promise\./gi.test(code)) {
+                        issues.push({
+                            type: 'Best Practice',
+                            severity: 'medium',
+                            title: 'Missing await in Async Function',
+                            description: 'Async function contains Promise without await.',
+                            line: getLineNumber(code, /async.*function/gi),
+                            suggestion: 'Use await with Promise calls in async functions.',
+                            code: 'Async function with unhandled Promise'
+                        });
+                        scoreAdjustment -= 8;
+                    }
+
+                    // TypeScript specific checks
+                    if (language === 'typescript') {
+                        if (/any\s*;|:\s*any/gi.test(code)) {
+                            issues.push({
+                                type: 'Type Safety',
+                                severity: 'medium',
+                                title: 'Usage of "any" Type',
+                                description: 'Using "any" defeats the purpose of TypeScript\'s type safety.',
+                                line: getLineNumber(code, /any\s*;|:\s*any/gi),
+                                suggestion: 'Use specific types or interfaces instead of "any".',
+                                code: 'any type usage detected'
+                            });
+                            scoreAdjustment -= 10;
+                        }
+                    }
+                    break;
+
+                case 'python':
+                    // Check for print statements
+                    if (/print\s*\(/gi.test(code)) {
+                        issues.push({
+                            type: 'Quality',
+                            severity: 'low',
+                            title: 'Print Statements in Code',
+                            description: 'Print statements should be replaced with proper logging.',
+                            line: getLineNumber(code, /print\s*\(/gi),
+                            suggestion: 'Use logging module instead of print statements.',
+                            code: code.match(/print\([^)]*\)/gi)?.[0] || 'Print statement'
+                        });
+                        scoreAdjustment -= 2;
+                    }
+
+                    // Check for list comprehension instead of loops
+                    if (/for\s+\w+\s+in.*:\s*\n\s*\w+\.append/gi.test(code)) {
+                        issues.push({
+                            type: 'Best Practice',
+                            severity: 'low',
+                            title: 'Use List Comprehension',
+                            description: 'Simple append loops can be replaced with list comprehensions.',
+                            line: getLineNumber(code, /for\s+\w+\s+in.*:\s*\n\s*\w+\.append/gi),
+                            suggestion: 'Use list comprehension for better readability and performance.',
+                            code: 'For loop with append'
+                        });
+                        scoreAdjustment -= 3;
+                    }
+
+                    // Check for proper docstrings
+                    if (/def\s+\w+.*:\s*\n\s*""".*"""/gi.test(code)) {
+                        issues.push({
+                            type: 'Documentation',
+                            severity: 'low',
+                            title: 'Good Documentation',
+                            description: 'Function has proper docstring documentation.',
+                            line: getLineNumber(code, /def\s+\w+/gi),
+                            suggestion: 'Excellent! Continue documenting functions.',
+                            code: 'Docstring present',
+                            positive: true
+                        });
+                        scoreAdjustment += 3;
+                    }
+                    break;
+
+                case 'java':
+                    // Check for proper exception handling
+                    if (/catch\s*\(\s*Exception\s+/gi.test(code)) {
+                        issues.push({
+                            type: 'Error Handling',
+                            severity: 'medium',
+                            title: 'Catching Generic Exception',
+                            description: 'Catching generic Exception can hide specific error types.',
+                            line: getLineNumber(code, /catch\s*\(\s*Exception/gi),
+                            suggestion: 'Catch specific exception types when possible.',
+                            code: 'catch (Exception e)'
+                        });
+                        scoreAdjustment -= 8;
+                    }
+
+                    // Check for proper resource management
+                    if (/try\s*\([^)]*\)/gi.test(code)) {
+                        issues.push({
+                            type: 'Resource Management',
+                            severity: 'low',
+                            title: 'Try-with-Resources',
+                            description: 'Good use of try-with-resources for automatic resource management.',
+                            line: getLineNumber(code, /try\s*\(/gi),
+                            suggestion: 'Excellent! Resources will be automatically closed.',
+                            code: 'Try-with-resources detected',
+                            positive: true
+                        });
+                        scoreAdjustment += 5;
+                    }
+                    break;
+
+                case 'csharp':
+                    // Check for proper null checking
+                    if (/\w+\.\w+.*null/gi.test(code) && !/\?\./gi.test(code)) {
+                        issues.push({
+                            type: 'Null Safety',
+                            severity: 'medium',
+                            title: 'Potential Null Reference',
+                            description: 'Object might be null before accessing its members.',
+                            line: getLineNumber(code, /\w+\.\w+/gi),
+                            suggestion: 'Use null-conditional operator (?.) or null checking.',
+                            code: 'Potential null reference access'
+                        });
+                        scoreAdjustment -= 10;
+                    }
+
+                    // Check for async/await best practices
+                    if (/\.Result|\.Wait\(\)/gi.test(code)) {
+                        issues.push({
+                            type: 'Async Pattern',
+                            severity: 'high',
+                            title: 'Blocking Async Call',
+                            description: 'Using .Result or .Wait() can cause deadlocks.',
+                            line: getLineNumber(code, /\.Result|\.Wait\(\)/gi),
+                            suggestion: 'Use await instead of .Result or .Wait().',
+                            code: code.match(/\.[^;]*(?:Result|Wait\(\))/gi)?.[0] || 'Blocking async call'
+                        });
+                        scoreAdjustment -= 15;
+                    }
+                    break;
+
+                case 'php':
+                    // Check for error reporting
+                    if (/error_reporting\(0\)|ini_set.*error_reporting.*0/gi.test(code)) {
+                        issues.push({
+                            type: 'Error Handling',
+                            severity: 'medium',
+                            title: 'Error Reporting Disabled',
+                            description: 'Disabling error reporting can hide important issues.',
+                            line: getLineNumber(code, /error_reporting\(0\)/gi),
+                            suggestion: 'Use proper error handling instead of disabling error reporting.',
+                            code: 'Error reporting disabled'
+                        });
+                        scoreAdjustment -= 10;
+                    }
+
+                    // Check for proper variable initialization
+                    if (/\$\w+\s*=.*\$_(?:GET|POST|REQUEST)\[/gi.test(code)) {
+                        issues.push({
+                            type: 'Security',
+                            severity: 'high',
+                            title: 'Unsanitized Input Usage',
+                            description: 'Direct use of superglobal variables without sanitization.',
+                            line: getLineNumber(code, /\$_(?:GET|POST|REQUEST)/gi),
+                            suggestion: 'Sanitize and validate all user inputs using filter_var() or similar.',
+                            code: code.match(/\$\w+\s*=.*\$_(?:GET|POST|REQUEST)\[[^\]]*\]/gi)?.[0] || 'Unsanitized input'
+                        });
+                        scoreAdjustment -= 20;
+                    }
+                    break;
+
+                case 'ruby':
+                    // Check for proper string interpolation
+                    if (/\+.*".*".*\+/gi.test(code)) {
+                        issues.push({
+                            type: 'Best Practice',
+                            severity: 'low',
+                            title: 'String Concatenation',
+                            description: 'String concatenation with + is less efficient than interpolation.',
+                            line: getLineNumber(code, /\+.*".*".*\+/gi),
+                            suggestion: 'Use string interpolation: "text #{variable}" instead of concatenation.',
+                            code: 'String concatenation with +'
+                        });
+                        scoreAdjustment -= 3;
+                    }
+
+                    // Check for proper method naming
+                    if (/def\s+[A-Z]\w*/gi.test(code)) {
+                        issues.push({
+                            type: 'Naming Convention',
+                            severity: 'low',
+                            title: 'Method Naming Convention',
+                            description: 'Ruby method names should be snake_case, not PascalCase.',
+                            line: getLineNumber(code, /def\s+[A-Z]\w*/gi),
+                            suggestion: 'Use snake_case for method names: def my_method instead of def MyMethod.',
+                            code: code.match(/def\s+[A-Z]\w*/gi)?.[0] || 'PascalCase method name'
+                        });
+                        scoreAdjustment -= 2;
+                    }
+                    break;
+
+                case 'go':
+                    // Check for proper error handling patterns
+                    if (/err\s*:=.*\n(?!\s*if\s+err\s*!=\s*nil)/gi.test(code)) {
+                        issues.push({
+                            type: 'Error Handling',
+                            severity: 'medium',
+                            title: 'Unchecked Error',
+                            description: 'Error variable assigned but not checked immediately.',
+                            line: getLineNumber(code, /err\s*:=/gi),
+                            suggestion: 'Check error immediately after assignment: if err != nil { ... }',
+                            code: 'Unchecked error variable'
+                        });
+                        scoreAdjustment -= 10;
+                    }
+
+                    // Check for goroutine best practices
+                    if (/go\s+func.*\{.*panic/gi.test(code)) {
+                        issues.push({
+                            type: 'Concurrency',
+                            severity: 'high',
+                            title: 'Panic in Goroutine',
+                            description: 'Panic in goroutine can crash the entire program.',
+                            line: getLineNumber(code, /go\s+func/gi),
+                            suggestion: 'Handle errors gracefully in goroutines, avoid panic.',
+                            code: 'Goroutine with panic'
+                        });
+                        scoreAdjustment -= 15;
+                    }
+                    break;
+
+                case 'rust':
+                    // Check for proper Option/Result handling
+                    if (/\.unwrap\(\).*\.unwrap\(\)/gi.test(code)) {
+                        issues.push({
+                            type: 'Error Handling',
+                            severity: 'high',
+                            title: 'Multiple unwrap() Calls',
+                            description: 'Multiple unwrap() calls can cause cascading panics.',
+                            line: getLineNumber(code, /\.unwrap\(\)/gi),
+                            suggestion: 'Use ? operator or proper error handling with match.',
+                            code: 'Multiple unwrap() calls'
+                        });
+                        scoreAdjustment -= 12;
+                    }
+
+                    // Check for lifetime annotations
+                    if (/'[a-z]+.*struct.*\{/gi.test(code)) {
+                        issues.push({
+                            type: 'Memory Management',
+                            severity: 'low',
+                            title: 'Proper Lifetime Management',
+                            description: 'Good use of lifetime annotations in structs.',
+                            line: getLineNumber(code, /'[a-z]+/gi),
+                            suggestion: 'Excellent! Proper lifetime management prevents dangling references.',
+                            code: 'Lifetime annotations present',
+                            positive: true
+                        });
+                        scoreAdjustment += 5;
+                    }
+                    break;
+            }
+
+            return { issues, scoreAdjustment };
+        }
+
+        function getLineNumber(code, pattern) {
+            const match = code.search(pattern);
+            if (match === -1) return 1;
+            return code.substring(0, match).split('\n').length;
+        }
+
+        function getSeverityWeight(severity) {
+            const weights = { critical: 4, high: 3, medium: 2, low: 1 };
+            return weights[severity] || 0;
+        }
+
+        function showResults(analysis) {
+            const resultsDiv = document.getElementById('results');
+            const summaryDiv = document.getElementById('summary');
+            const issuesDiv = document.getElementById('issues');
+
+            // Summary
+            const negativeIssues = analysis.issues.filter(i => !i.positive);
+            const criticalCount = negativeIssues.filter(i => i.severity === 'critical').length;
+            const highCount = negativeIssues.filter(i => i.severity === 'high').length;
+            const mediumCount = negativeIssues.filter(i => i.severity === 'medium').length;
+            const lowCount = negativeIssues.filter(i => i.severity === 'low').length;
+
+            const riskLevel = analysis.score >= 80 ? 'Low Risk' : 
+                             analysis.score >= 60 ? 'Medium Risk' : 'High Risk';
+
+            const scoreColor = analysis.score >= 80 ? 'var(--success-color)' : 
+                              analysis.score >= 60 ? 'var(--warning-color)' : 'var(--error-color)';
+
+            summaryDiv.innerHTML = `
+                <div class="summary-header">
+                    <div>
+                        <div class="summary-title">Code Review Results</div>
+                        <div style="margin-top: 0.5rem;">
+                            <div><strong>Platform:</strong> ${analysis.platform.charAt(0).toUpperCase() + analysis.platform.slice(1)}</div>
+                            <div><strong>Language:</strong> ${analysis.language.charAt(0).toUpperCase() + analysis.language.slice(1)}</div>
+                            <div><strong>Risk Level:</strong> <span style="color: ${scoreColor};">${riskLevel}</span></div>
+                        </div>
+                    </div>
+                    <div class="score-display">
+                        <div class="score-number" style="color: ${scoreColor};">${analysis.score}</div>
+                        <div class="score-label">out of 100</div>
+                    </div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-number" style="color: #dc2626;">${stats.critical}</div>
-                    <div class="stat-label">Critical</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number" style="color: #ea580c;">${stats.high}</div>
-                    <div class="stat-label">High Priority</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number" style="color: #16a34a;">${stats.suggestions}</div>
-                    <div class="stat-label">Suggestions</div>
-                </div>
+                ${negativeIssues.length > 0 ? `
+                    <div class="summary-badges">
+                        ${criticalCount > 0 ? `<div class="badge critical">🚨 ${criticalCount} Critical</div>` : ''}
+                        ${highCount > 0 ? `<div class="badge high">⚠️ ${highCount} High</div>` : ''}
+                        ${mediumCount > 0 ? `<div class="badge medium">⚡ ${mediumCount} Medium</div>` : ''}
+                        ${lowCount > 0 ? `<div class="badge low">ℹ️ ${lowCount} Info</div>` : ''}
+                    </div>
+                ` : ''}
             `;
-        }
 
-        function generateIssuesContent(issues) {
-            const content = document.getElementById('issues-content');
-            if (issues.length === 0) {
-                content.innerHTML = '<p>No general issues found in the code.</p>';
-                return;
-            }
-
-            content.innerHTML = issues.map(issue => `
-                <div class="issue-card severity-${issue.severity}">
-                    <div class="issue-header">
-                        <span class="severity-badge badge-${issue.severity}">${issue.severity}</span>
-                        <span class="issue-title">${issue.title}</span>
+            // Issues
+            if (analysis.issues.length === 0 || negativeIssues.length === 0) {
+                issuesDiv.innerHTML = `
+                    <div class="no-issues">
+                        <div class="no-issues-icon">🎉</div>
+                        <h3>No Issues Found!</h3>
+                        <p>Your code looks clean and follows best practices.</p>
                     </div>
-                    <div class="issue-description">${issue.description}</div>
-                    <div class="code-snippet">${issue.code}</div>
-                    <div class="suggestion">
-                        <div class="suggestion-title">💡 Suggested Fix:</div>
-                        <div>${issue.suggestion}</div>
-                    </div>
-                </div>
-            `).join('');
-        }
+                `;
+            } else {
+                issuesDiv.innerHTML = negativeIssues.map(issue => {
+                    const severityIcon = {
+                        critical: '🚨',
+                        high: '⚠️',
+                        medium: '⚡',
+                        low: 'ℹ️'
+                    }[issue.severity];
 
-        function generateSuggestionsContent(suggestions) {
-            const content = document.getElementById('suggestions-content');
-            if (suggestions.length === 0) {
-                content.innerHTML = '<p>No additional suggestions at this time.</p>';
-                return;
-            }
-
-            content.innerHTML = suggestions.map(suggestion => `
-                <div class="issue-card">
-                    <div class="issue-header">
-                        <span class="severity-badge badge-info">${suggestion.priority}</span>
-                        <span class="issue-title">${suggestion.title}</span>
-                    </div>
-                    <div class="issue-description">${suggestion.description}</div>
-                </div>
-            `).join('');
-        }
-
-        function generateSecurityContent(securityIssues) {
-            const content = document.getElementById('security-content');
-            if (securityIssues.length === 0) {
-                content.innerHTML = '<p>✅ No security issues detected in the code changes.</p>';
-                return;
-            }
-
-            content.innerHTML = securityIssues.map(issue => `
-                <div class="issue-card severity-${issue.severity}">
-                    <div class="issue-header">
-                        <span class="severity-badge badge-${issue.severity}">${issue.severity}</span>
-                        <span class="issue-title">🔒 ${issue.title}</span>
-                    </div>
-                    <div class="issue-description">${issue.description}</div>
-                    <div class="code-snippet">${issue.code}</div>
-                    <div class="suggestion">
-                        <div class="suggestion-title">🛡️ Security Fix:</div>
-                        <div>${issue.suggestion}</div>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function generatePerformanceContent(performanceIssues) {
-            const content = document.getElementById('performance-content');
-            if (performanceIssues.length === 0) {
-                content.innerHTML = '<p>⚡ No performance issues detected in the code changes.</p>';
-                return;
-            }
-
-            content.innerHTML = performanceIssues.map(issue => `
-                <div class="issue-card severity-${issue.severity}">
-                    <div class="issue-header">
-                        <span class="severity-badge badge-${issue.severity}">${issue.severity}</span>
-                        <span class="issue-title">⚡ ${issue.title}</span>
-                    </div>
-                    <div class="issue-description">${issue.description}</div>
-                    <div class="code-snippet">${issue.code}</div>
-                    <div class="suggestion">
-                        <div class="suggestion-title">🚀 Performance Optimization:</div>
-                        <div>${issue.suggestion}</div>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        // Add sample data for demo
-        document.addEventListener('DOMContentLoaded', function() {
-            // Initialize platform UI
-            updatePlatformUI();
+                    return `
+                        <div class="issue-card ${issue.severity}">
+                            <div class="issue-header">
+                                <div class="issue-title">${issue.title}</div>
+                                <div class="issue-meta">
+                                    <div class="badge ${issue.severity}">
+                                        ${severityIcon} ${issue.severity.charAt(0).toUpperCase() + issue.severity.slice(1)}
+                                    </div>
+                                    <div style="font-size: 0.85rem; color: var(--text-secondary);">
+                                        Line ${issue.line} • ${issue.type}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="issue-description">${issue.description}</div>
+                            <div class="code-block">${issue.code}</div>
+                            <div class="suggestion">
+                                <div class="suggestion-title">💡 Suggestion</div>
+                                <div>${issue.suggestion}</div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }}
             
-            // Set sample data based on selected language
-            updateSampleData();
-            
-            // Add language change listener
-            document.getElementById('file-language').addEventListener('change', updateSampleData);
-        });
-
-        function updateSampleData() {
-            const language = document.getElementById('file-language').value;
-            const sampleData = getSampleData(language);
-            
-            document.getElementById('commit-message').value = sampleData.commit;
-            document.getElementById('pr-description').value = sampleData.description;
-            document.getElementById('code-changes').value = sampleData.code;
-        }
-
-        function getSampleData(language) {
-            const samples = {
-                javascript: {
-                    commit: 'fix: resolve XSS vulnerability in user input handling',
-                    description: 'Updated the user input processing to prevent XSS attacks by sanitizing HTML content and using textContent instead of innerHTML.',
-                    code: `@@ -15,7 +15,9 @@ class UserInput {
- 
-     processUserComment(comment) {
--        document.getElementById('comments').innerHTML += '<div>' + comment + '</div>';
-+        const commentDiv = document.createElement('div');
-+        commentDiv.textContent = comment; // Safe from XSS
-+        document.getElementById('comments').appendChild(commentDiv);
-     }
- 
-     validateInput(input) {
--        return eval('(' + input + ')'); // Dangerous!
-+        try {
-+            return JSON.parse(input); // Safe parsing
-+        } catch(e) {
-+            console.log('Invalid input:', e);
-+            return null;
-+        }
-     }`
-                },
-                python: {
-                    commit: 'fix: resolve pickle deserialization vulnerability',
-                    description: 'Replaced unsafe pickle.loads() with JSON parsing to prevent arbitrary code execution.',
-                    code: `@@ -10,8 +10,12 @@ class DataProcessor:
-     
-     def load_user_data(self, data_string):
--        return pickle.loads(data_string)  # Unsafe!
-+        try:
-+            return json.loads(data_string)  # Safe parsing
-+        except json.JSONDecodeError:
-+            print("Invalid JSON data")
-+            return None
- 
-     def process_items(self, items):
--        for i in range(len(items)):  # Non-pythonic
--            print(items[i])
-+        for item in items:  # Pythonic way
-+            print(item)`
-                },
-                java: {
-                    commit: 'perf: optimize string concatenation in loop',
-                    description: 'Replaced String concatenation with StringBuilder for better performance in data processing loop.',
-                    code: `@@ -20,10 +20,12 @@ public class DataProcessor {
- 
-     public String processData(List<String> items) {
--        String result = "";
-+        StringBuilder result = new StringBuilder();
-         for (String item : items) {
--            result += item + ", ";  // Inefficient
-+            result.append(item).append(", ");  // Efficient
-         }
--        System.out.println("Result: " + result);  // Debug code
--        return result;
-+        String finalResult = result.toString();
-+        logger.info("Processed {} items", items.size());
-+        return finalResult;
-     }
- }`
-                },
-                python: {
-                    commit: 'security: fix SQL injection in user query',
-                    description: 'Implemented parameterized queries to prevent SQL injection attacks in user search functionality.',
-                    code: `@@ -25,8 +25,10 @@ class UserRepository:
- 
-     def find_user(self, username):
--        query = f"SELECT * FROM users WHERE username = '{username}'"  # SQL Injection!
--        return self.db.execute(query)
-+        query = "SELECT * FROM users WHERE username = %s"  # Safe parameterized query
-+        return self.db.execute(query, (username,))
- 
-     def get_all_users(self):
--        except:  # Bare except is bad
-+        except DatabaseError as e:  # Specific exception
-+            print(f"Database error: {e}")
-             return []`
-                },
-                csharp: {
-                    commit: 'fix: resolve memory leak in event handlers',
-                    description: 'Added proper event handler cleanup to prevent memory leaks when disposing objects.',
-                    code: `@@ -15,6 +15,8 @@ public class EventManager : IDisposable
- 
-     public void Subscribe(INotifyPropertyChanged obj) {
-         obj.PropertyChanged += OnPropertyChanged;
-+        // Store reference for cleanup
-+        _subscriptions.Add(obj);
-     }
- 
-     public void Dispose() {
--        // Missing cleanup
-+        foreach(var obj in _subscriptions) {
-+            obj.PropertyChanged -= OnPropertyChanged;
-+        }
-+        _subscriptions.Clear();
-     }`
-                },
-                go: {
-                    commit: 'fix: add proper error handling to HTTP client',
-                    description: 'Added comprehensive error handling for HTTP requests to prevent silent failures.',
-                    code: `@@ -10,7 +10,15 @@ func fetchUserData(url string) (*User, error) {
- 
-     resp, err := http.Get(url)
--    defer resp.Body.Close()  // Potential nil pointer
-+    if err != nil {
-+        return nil, fmt.Errorf("failed to fetch user data: %w", err)
-+    }
-+    defer resp.Body.Close()
-+    
-+    if resp.StatusCode != http.StatusOK {
-+        return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
-+    }
- 
-     var user User
--    json.NewDecoder(resp.Body).Decode(&user)  // No error handling
-+    if err := json.NewDecoder(resp.Body).Decode(&user); err != nil {
-+        return nil, fmt.Errorf("failed to decode response: %w", err)
-+    }
-     return &user, nil
- }`
-                }
-            };
-
-            return samples[language] || samples.javascript;
-        }
-    </script>
-</body>
-<footer><h3>Made By Saidhiraj and Rian K Sinu</h3><br
-        <h4>copyright CodeBlasters 2025</h4></footer>
-</html>
