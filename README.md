@@ -1,8 +1,6 @@
 # 🤖 AI PR Reviewer with GitHub Copilot
 
 An intelligent code analysis tool that combines AI-powered pull request reviews with GitHub Copilot integration for enhanced code quality assessment and automated fixes.
-
-![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Version](https://img.shields.io/badge/version-2.0.0-green.svg)
 ![GitHub Copilot](https://img.shields.io/badge/GitHub-Copilot-purple.svg)
 
@@ -238,15 +236,6 @@ languagePatterns.go = {
 
 ### Issues and Bugs
 Please report issues on our [GitHub Issues](https://github.com/your-org/ai-pr-reviewer-copilot/issues) page.
-
-### Community
-- 💬 [Discussions](https://github.com/your-org/ai-pr-reviewer-copilot/discussions)
-- 📧 Email: support@ai-pr-reviewer.com
-- 🐦 Twitter: [@AICodeReviewer](https://twitter.com/AICodeReviewer)
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## 🙏 Acknowledgments
 
