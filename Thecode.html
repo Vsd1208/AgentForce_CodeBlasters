@@ -6,21 +6,24 @@
     <title>AI PR Reviewer with Copilot</title>
     <style>
         :root { 
-            --primary-color: rgb(106, 8, 162);
-            --primary-dark: #1d4ed8;
-            --secondary-color: #64748b;
-            --success-color: #16a34a;
-            --warning-color: #d97706;
-            --error-color: #dc2626;
-            --critical-color: #7c2d12;
-            --background: #ffe7fc;
-            --surface: #d0449d;
-            --text-primary: #1e293b;
-            --text-secondary: #64748b;
-            --border: #911ebe;
-            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-            --copilot-color: #7c3aed;
-            --copilot-bg: rgba(124, 58, 237, 0.1);
+            --primary-color: #7c3aed; /* Deep cosmic purple */
+            --primary-dark: #4338ca; /* Dark nebula blue */
+            --secondary-color: #475569; /* Asteroid gray */
+            --success-color: #10b981; /* Aurora green */
+            --warning-color: #f59e0b; /* Solar orange */
+            --error-color: #ef4444; /* Red giant */
+            --critical-color: #dc2626; /* Supernova red */
+            --background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%); /* Deep space gradient */
+            --surface: linear-gradient(145deg, #1e1b4b 0%, #312e81 100%); /* Nebula surface */
+            --text-primary: #e2e8f0; /* Starlight */
+            --text-secondary: #94a3b8; /* Moonbeam */
+            --border: #6366f1; /* Cosmic blue */
+            --shadow: 0 4px 20px rgba(139, 92, 246, 0.3);
+            --copilot-color: #8b5cf6; /* Galaxy purple */
+            --copilot-bg: rgba(139, 92, 246, 0.15);
+            --accent-cyan: #06b6d4; /* Pulsar cyan */
+            --accent-pink: #ec4899; /* Pink nebula */
+            --accent-gold: #fbbf24; /* Golden star */
         }
 
         * {
@@ -96,11 +99,11 @@
 
         .platform-tab.active {
             background: var(--primary-color);
-            color: white;
+            color: #475569;
         }
         .platform-tab:hover:not(.active) {
             background: rgb(106, 8, 162);
-            color: white;
+            color: #475569;
         }
 
         /* Copilot specific styles */
@@ -127,7 +130,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
+            color: #7c3aed;
             font-weight: bold;
         }
 
@@ -153,14 +156,18 @@
         }
 
         .copilot-features {
+            background-color: var(--copilot-bg);
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 1rem;
             margin-top: 1rem;
         }
-
+        .form-input::placeholder, .form-textarea::placeholder {
+            color: var(--text-secondary);
+        }   
+    
         .copilot-feature {
-            background: rgba(255, 255, 255, 0.8);
+            background: #7c3aed5e;
             padding: 1rem;
             border-radius: 8px;
             border-left: 4px solid var(--copilot-color);
@@ -181,14 +188,15 @@
             gap: 0.5rem;
             margin-bottom: 1rem;
         }
-
         .suggestion-item {
-            background: white;
+            background: var(--surface);
+            border: 1px solid var(--border);
             padding: 1rem;
             border-radius: 8px;
             margin-bottom: 0.75rem;
             border-left: 4px solid var(--copilot-color);
             transition: transform 0.2s;
+            color: var(--text-primary);
         }
 
         .suggestion-item:hover {
@@ -213,7 +221,7 @@
         }
 
         .copilot-code {
-            background: #f8fafc;
+            background: var(--copilot-bg);
             border: 1px solid #e2e8f0;
             border-radius: 6px;
             padding: 1rem;
@@ -332,6 +340,19 @@
             font-size: 0.9rem;
             transition: border-color 0.2s;
             background: white;
+        }
+
+        .form-input::placeholder, .form-textarea::placeholder {
+            color: var(--text-secondary);
+        }        .suggestion-item {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+            border-left: 4px solid var(--copilot-color);
+            transition: transform 0.2s;
+            color: var(--text-primary);
         }
 
         .form-input:focus, .form-textarea:focus, .form-select:focus {
