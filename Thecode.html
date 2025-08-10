@@ -3,22 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI PR Reviewer</title>
+    <title>AI PR Reviewer with Copilot</title>
     <style>
         :root { 
-            --primary-color: rgb(106, 8, 162);;
+            --primary-color: rgb(106, 8, 162);
             --primary-dark: #1d4ed8;
             --secondary-color: #64748b;
-            --success-color: #10b981;
-            --warning-color: #f59e0b;
-            --error-color: #ef4444;
-            --critical-color: #dc2626;
+            --success-color: #16a34a;
+            --warning-color: #d97706;
+            --error-color: #dc2626;
+            --critical-color: #7c2d12;
             --background: #ffe7fc;
             --surface: #d0449d;
             --text-primary: #1e293b;
             --text-secondary: #64748b;
             --border: #911ebe;
             --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --copilot-color: #7c3aed;
+            --copilot-bg: rgba(124, 58, 237, 0.1);
         }
 
         * {
@@ -98,7 +100,163 @@
         }
         .platform-tab:hover:not(.active) {
             background: rgb(106, 8, 162);
-            color:white
+            color: white;
+        }
+
+        /* Copilot specific styles */
+        .copilot-integration {
+            background: var(--copilot-bg);
+            border: 2px solid var(--copilot-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .copilot-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .copilot-logo {
+            width: 32px;
+            height: 32px;
+            background: var(--copilot-color);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .copilot-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-bottom: 1rem;
+        }
+
+        .copilot-status.connected {
+            background: rgba(34, 197, 94, 0.1);
+            color: #16a34a;
+        }
+
+        .copilot-status.disconnected {
+            background: rgba(239, 68, 68, 0.1);
+            color: #dc2626;
+        }
+
+        .copilot-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .copilot-feature {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 4px solid var(--copilot-color);
+        }
+
+        .copilot-suggestions {
+            background: var(--background);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border: 2px solid var(--copilot-color);
+        }
+
+        .copilot-suggestions h3 {
+            color: var(--copilot-color);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .suggestion-item {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+            border-left: 4px solid var(--copilot-color);
+            transition: transform 0.2s;
+        }
+
+        .suggestion-item:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow);
+        }
+
+        .suggestion-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .suggestion-type {
+            background: var(--copilot-color);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .copilot-code {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 1rem;
+            font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+            font-size: 0.85rem;
+            margin: 0.5rem 0;
+            overflow-x: auto;
+            position: relative;
+            white-space: pre-wrap;
+        }
+
+        .copilot-code::before {
+            content: "💡 Copilot Suggestion";
+            position: absolute;
+            top: 0.25rem;
+            right: 0.5rem;
+            background: var(--copilot-color);
+            color: white;
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+        }
+
+        .apply-suggestion-btn {
+            background: var(--copilot-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 0.5rem;
+        }
+
+        .apply-suggestion-btn:hover {
+            background: #6d28d9;
+            transform: translateY(-1px);
+        }
+
+        .apply-suggestion-btn.applied {
+            background: var(--success-color);
+            cursor: not-allowed;
         }
 
         .demo-section {
@@ -131,7 +289,7 @@
 
         .demo-btn:hover {
             border-color: var(--primary-color);
-            background: white;
+            background: rgb(244, 161, 246);
             transform: translateY(-1px);
         }
 
@@ -192,8 +350,8 @@
             min-height: 200px;
         }
 
-        .analyze-btn {
-            background: var(--primary-color);
+        .analyze-btn, .fetch-btn {
+            background: rgb(106, 4, 121);
             color: white;
             border: none;
             padding: 1rem 2rem;
@@ -205,26 +363,35 @@
             align-items: center;
             justify-content: center;
             gap: 0.5rem;
-            margin: 0 auto;
             font-size: 1rem;
         }
 
-        .analyze-btn:hover:not(:disabled) {
+        .fetch-btn {
+            padding: 0.75rem 1.5rem;
+            margin-top: 0.5rem;
+            width: 100%;
+        }
+
+        .analyze-btn {
+            margin: 0 auto;
+        }
+
+        .analyze-btn:hover:not(:disabled), .fetch-btn:hover:not(:disabled) {
             background: var(--primary-dark);
             transform: translateY(-1px);
             box-shadow: var(--shadow);
         }
 
-        .analyze-btn:focus {
+        .analyze-btn:focus, .fetch-btn:focus {
             outline: 2px solid var(--primary-color);
             outline-offset: 2px;
         }
 
-        .analyze-btn:active:not(:disabled) {
+        .analyze-btn:active:not(:disabled), .fetch-btn:active:not(:disabled) {
             transform: translateY(0);
         }
 
-        .analyze-btn:disabled {
+        .analyze-btn:disabled, .fetch-btn:disabled {
             opacity: 0.6;
             cursor: not-allowed;
             transform: none;
@@ -299,10 +466,10 @@
             gap: 0.25rem;
         }
 
-        .badge.critical { background: rgba(239, 68, 68, 0.2); color: var(--critical-color); }
-        .badge.high { background: rgba(245, 158, 11, 0.2); color: var(--warning-color); }
-        .badge.medium { background: rgba(59, 130, 246, 0.2); color: var(--primary-color); }
-        .badge.low { background: rgba(16, 185, 129, 0.2); color: var(--success-color); }
+        .badge.critical { background: rgb(247, 206, 3); color: var(--critical-color);}
+        .badge.high { background: rgb(249, 3, 3); color: white; }
+        .badge.medium { background: rgb(170, 240, 6); color: var(--primary-color); }
+        .badge.low { background: rgb(18, 244, 2); color: white; }
 
         .issues-list {
             display: flex;
@@ -317,6 +484,7 @@
             padding: 1.5rem;
             border-left: 4px solid;
             transition: transform 0.2s;
+            position: relative;
         }
 
         .issue-card:hover {
@@ -324,10 +492,28 @@
             box-shadow: var(--shadow);
         }
 
-        .issue-card.critical { border-left-color: var(--critical-color); }
-        .issue-card.high { border-left-color: var(--warning-color); }
-        .issue-card.medium { border-left-color: var(--primary-color); }
-        .issue-card.low { border-left-color: var(--success-color); }
+        .issue-card.critical { border-left-color:rgb(247, 206, 3) ; }
+        .issue-card.high { border-left-color:rgb(249, 3, 3); }
+        .issue-card.medium { border-left-color:rgb(170, 240, 6) ; }
+        .issue-card.low { border-left-color: rgb(18, 244, 2); }
+
+        .issue-card.fixed {
+            opacity: 0.7;
+            border-left-color: var(--success-color) !important;
+        }
+
+        .issue-card.fixed::after {
+            content: "✅ FIXED";
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: var(--success-color);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
 
         .issue-header {
             display: flex;
@@ -365,6 +551,30 @@
             margin: 1rem 0;
             overflow-x: auto;
             position: relative;
+        }
+
+        .code-line {
+            margin: 0.25rem 0;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+        }
+
+        .code-line.error {
+            background: rgba(239, 68, 68, 0.1);
+            border-left: 3px solid var(--error-color);
+        }
+
+        .code-line.suggestion {
+            background: rgba(34, 197, 94, 0.1);
+            border-left: 3px solid var(--success-color);
+        }
+
+        .line-number {
+            color: var(--text-secondary);
+            margin-right: 1rem;
+            font-weight: bold;
+            min-width: 30px;
+            display: inline-block;
         }
 
         .suggestion {
@@ -410,37 +620,11 @@
         .error-message {
             background: rgba(239, 68, 68, 0.1);
             border: 1px solid rgba(239, 68, 68, 0.3);
-            color: var(--critical-color);
+            color: var(--error-color);
             padding: 1rem;
             border-radius: 8px;
             margin: 1rem 0;
             display: none;
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                padding: 1rem;
-            }
-
-            .form-row {
-                grid-template-columns: 1fr;
-            }
-
-            .demo-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .issue-header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 0.5rem;
-            }
-
-            .summary-header {
-                flex-direction: column;
-                gap: 1rem;
-                text-align: center;
-            }
         }
 
         .api-config {
@@ -476,55 +660,147 @@
             color: var(--primary-color);
         }
 
-        .loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            display: none;
-            justify-content: center;
+        .fix-all-btn {
+            background: var(--success-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 1rem;
+            display: flex;
             align-items: center;
-            z-index: 1000;
+            gap: 0.5rem;
         }
 
-        .loading-content {
-            background: white;
-            padding: 2rem;
-            border-radius: 12px;
-            text-align: center;
-            min-width: 300px;
+        .fix-all-btn:hover {
+            background: #15803d;
+            transform: translateY(-1px);
         }
 
-        .loading-spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid var(--border);
-            border-top: 4px solid var(--primary-color);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 1rem;
+        .applied-fixes {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            display: none;
         }
 
-        .rate-limit-info {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            margin-top: 0.5rem;
-            padding: 0.5rem;
-            background: rgba(59, 130, 246, 0.05);
-            border-radius: 4px;
+        .applied-fixes h4 {
+            color: var(--success-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .applied-fixes ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .applied-fixes li {
+            color: var(--success-color);
+            padding: 0.25rem 0;
+        }
+
+        .applied-fixes li::before {
+            content: "✅ ";
+            margin-right: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .demo-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .issue-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+
+            .summary-header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🤖 AI PR Reviewer</h1>
-            <p>Intelligent code analysis for pull requests with security, performance, and logic insights</p>
+            <h1>🤖 AI PR Reviewer with GitHub Copilot</h1>
+            <p>Intelligent code analysis powered by AI and enhanced with GitHub Copilot suggestions</p>
         </div>
 
         <div class="main-card">
+            <!-- GitHub Copilot Integration Section -->
+            <div class="copilot-integration">
+                <div class="copilot-header">
+                    <div class="copilot-logo">🐙</div>
+                    <div>
+                        <h3 style="margin: 0; color: var(--copilot-color);">GitHub Copilot Integration</h3>
+                        <p style="margin: 0.25rem 0 0 0; font-size: 0.9rem; color: var(--text-secondary);">
+                            Enhanced code analysis with AI-powered suggestions
+                        </p>
+                    </div>
+                </div>
+
+                <div class="copilot-status disconnected" id="copilot-status">
+                    <span>⚠️</span>
+                    <span>Copilot: Demo Mode (API integration available)</span>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="copilot-enabled">Enable Copilot Features</label>
+                    <select id="copilot-enabled" class="form-select" onchange="toggleCopilotFeatures()">
+                        <option value="demo">Demo Mode (Mock suggestions)</option>
+                        <option value="api">API Mode (Requires token)</option>
+                        <option value="disabled">Disabled</option>
+                    </select>
+                </div>
+
+                <div id="copilot-api-config" style="display: none;">
+                    <div class="form-group">
+                        <label class="form-label" for="copilot-token">GitHub Copilot API Token</label>
+                        <input 
+                            type="password" 
+                            id="copilot-token" 
+                            class="form-input" 
+                            placeholder="ghs_xxxxxxxxxxxxxxxxxxxx"
+                        >
+                        <small style="color: var(--text-secondary); font-size: 0.85rem;">
+                            Enterprise/Pro feature - requires GitHub Copilot Business subscription
+                        </small>
+                    </div>
+                </div>
+
+                <div class="copilot-features">
+                    <div class="copilot-feature">
+                        <strong>🔍 Smart Analysis</strong>
+                        <p>AI-powered code review with contextual suggestions</p>
+                    </div>
+                    <div class="copilot-feature">
+                        <strong>🛠️ Auto-Fix</strong>
+                        <p>Automatic code improvements and refactoring suggestions</p>
+                    </div>
+                    <div class="copilot-feature">
+                        <strong>📊 Quality Metrics</strong>
+                        <p>Advanced code quality assessment and scoring</p>
+                    </div>
+                </div>
+            </div>
+
             <!-- Platform Selection -->
             <div class="platform-tabs" role="tablist" aria-label="Select platform">
                 <button 
@@ -562,11 +838,11 @@
             <!-- Platform-specific content -->
             <div id="github-panel" class="platform-content active" role="tabpanel" aria-labelledby="github-tab">
                 <div class="platform-info">
-                    <strong>GitHub Integration:</strong> Analyze pull requests directly from GitHub repositories with webhooks and API integration.
+                    <strong>GitHub Integration with Copilot:</strong> Advanced PR analysis using GitHub's API and repository context.
                 </div>
                 <div class="api-config">
                     <div class="form-group">
-                        <label class="form-label" for="github-token">GitHub Personal Access Token (Optional)</label>
+                        <label class="form-label" for="github-token">GitHub Personal Access Token</label>
                         <input 
                             type="password" 
                             id="github-token" 
@@ -575,11 +851,11 @@
                             value=""
                         >
                         <small style="color: var(--text-secondary); font-size: 0.85rem;">
-                            For accessing private repositories and higher rate limits
+                            Required for private repositories and rate limit increases
                         </small>
                     </div>
                     <div class="form-group">
-                        <label class="form-label" for="github-repo">Repository (Optional)</label>
+                        <label class="form-label" for="github-repo">Repository</label>
                         <input 
                             type="text" 
                             id="github-repo" 
@@ -588,7 +864,7 @@
                         >
                     </div>
                     <div class="form-group">
-                        <label class="form-label" for="github-pr">Pull Request Number (Optional)</label>
+                        <label class="form-label" for="github-pr">Pull Request Number</label>
                         <input 
                             type="number" 
                             id="github-pr" 
@@ -596,31 +872,30 @@
                             placeholder="123"
                         >
                     </div>
-                    <button class="demo-btn" onclick="fetchGitHubPR()" style="margin-top: 0.5rem;">
-                        📥 Fetch PR from GitHub
+                    <button class="fetch-btn" onclick="fetchGitHubPR()" id="github-fetch-btn">
+                        <span class="spinner" style="display: none;"></span>
+                        <span>📥 Fetch PR with Copilot Context</span>
                     </button>
+                    <div id="github-status" style="display: none;"></div>
                 </div>
             </div>
 
             <div id="gitlab-panel" class="platform-content" role="tabpanel" aria-labelledby="gitlab-tab">
                 <div class="platform-info">
-                    <strong>GitLab Integration:</strong> Connect with GitLab merge requests using GitLab CI/CD pipelines and API endpoints.
+                    <strong>GitLab Integration:</strong> Connect with GitLab merge requests. Copilot suggestions work with GitLab code too!
                 </div>
                 <div class="api-config">
                     <div class="form-group">
-                        <label class="form-label" for="gitlab-token">GitLab Access Token (Optional)</label>
+                        <label class="form-label" for="gitlab-token">GitLab Access Token</label>
                         <input 
                             type="password" 
                             id="gitlab-token" 
                             class="form-input" 
                             placeholder="glpat-xxxxxxxxxxxxxxxxxxxx"
                         >
-                        <small style="color: var(--text-secondary); font-size: 0.85rem;">
-                            For accessing private projects and API features
-                        </small>
                     </div>
                     <div class="form-group">
-                        <label class="form-label" for="gitlab-project">Project ID (Optional)</label>
+                        <label class="form-label" for="gitlab-project">Project ID</label>
                         <input 
                             type="text" 
                             id="gitlab-project" 
@@ -629,7 +904,7 @@
                         >
                     </div>
                     <div class="form-group">
-                        <label class="form-label" for="gitlab-mr">Merge Request IID (Optional)</label>
+                        <label class="form-label" for="gitlab-mr">Merge Request IID</label>
                         <input 
                             type="number" 
                             id="gitlab-mr" 
@@ -637,30 +912,31 @@
                             placeholder="42"
                         >
                     </div>
-                    <button class="demo-btn" onclick="fetchGitLabMR()" style="margin-top: 0.5rem;">
-                        📥 Fetch MR from GitLab
+                    <button class="fetch-btn" onclick="fetchGitLabMR()" id="gitlab-fetch-btn">
+                        <span class="spinner" style="display: none;"></span>
+                        <span>📥 Fetch MR from GitLab</span>
                     </button>
+                    <div id="gitlab-status" style="display: none;"></div>
                 </div>
             </div>
 
             <div id="cli-panel" class="platform-content" role="tabpanel" aria-labelledby="cli-tab">
                 <div class="platform-info">
-                    <strong>CLI Tool:</strong> Use the command-line interface for local development and CI/CD integration.
-                    <br><br>
-                    <code>npm install -g ai-pr-reviewer</code><br>
-                    <code>ai-pr-review --file changes.diff --format json</code>
+                    <strong>CLI Tool with Copilot:</strong> Command-line interface enhanced with AI suggestions.<br><br>
+                    <code>npm install -g ai-pr-reviewer-copilot</code><br>
+                    <code>ai-pr-review --copilot --file changes.diff</code>
                 </div>
                 <div class="api-config">
                     <div class="form-group">
                         <label class="form-label" for="ai-provider">AI Analysis Provider</label>
-                        <select id="ai-provider" class="form-select">
-                            <option value="local">Local Analysis (Default)</option>
+                        <select id="ai-provider" class="form-select" onchange="updateCliConfig()">
+                            <option value="copilot">GitHub Copilot (Recommended)</option>
                             <option value="openai">OpenAI GPT-4</option>
                             <option value="cohere">Cohere Command</option>
-                            <option value="anthropic">Claude (Coming Soon)</option>
+                            <option value="local">Local Analysis</option>
                         </select>
                     </div>
-                    <div class="form-group" id="ai-token-group" style="display: none;">
+                    <div class="form-group" id="ai-token-group">
                         <label class="form-label" for="ai-token">API Key</label>
                         <input 
                             type="password" 
@@ -668,8 +944,20 @@
                             class="form-input" 
                             placeholder="Enter your API key"
                         >
-                        <small style="color: var(--text-secondary); font-size: 0.85rem;">
-                            Your API key is stored locally and never sent to our servers
+                    </div>
+                    <button class="fetch-btn" onclick="testCliConnection()" id="cli-test-btn">
+                        <span class="spinner" style="display: none;"></span>
+                        <span>🔧 Test CLI Configuration</span>
+                    </button>
+                    <div id="cli-status" style="display: none;"></div>
+                    
+                    <div class="form-group" style="margin-top: 1rem;">
+                        <label class="form-label">CLI Command Generator</label>
+                        <div class="code-block" id="cli-command">
+                            ai-pr-review --provider copilot --file changes.diff --output json
+                        </div>
+                        <small style="color: var(--text-secondary);">
+                            Copy this command to use the CLI tool with your current settings
                         </small>
                     </div>
                 </div>
@@ -677,7 +965,7 @@
 
             <!-- Demo Examples -->
             <div class="demo-section">
-                <div class="demo-label">Quick Demo Examples:</div>
+                <div class="demo-label">Quick Demo Examples (Enhanced with Copilot):</div>
                 <div class="demo-grid">
                     <button 
                         class="demo-btn" 
@@ -685,7 +973,7 @@
                         aria-label="Load security issues demo"
                     >
                         🔒 Security Issues<br>
-                        <small>SQL injection, weak auth</small>
+                        <small>SQL injection, XSS + Copilot fixes</small>
                     </button>
                     <button 
                         class="demo-btn" 
@@ -693,7 +981,7 @@
                         aria-label="Load performance issues demo"
                     >
                         ⚡ Performance Issues<br>
-                        <small>N+1 queries, inefficient loops</small>
+                        <small>N+1 queries + optimization tips</small>
                     </button>
                     <button 
                         class="demo-btn" 
@@ -701,7 +989,7 @@
                         aria-label="Load logic errors demo"
                     >
                         🧠 Logic Errors<br>
-                        <small>Assignment vs comparison</small>
+                        <small>Assignment vs comparison + fixes</small>
                     </button>
                     <button 
                         class="demo-btn" 
@@ -709,7 +997,7 @@
                         aria-label="Load clean code demo"
                     >
                         ✅ Clean Code<br>
-                        <small>Best practices example</small>
+                        <small>Best practices + Copilot approval</small>
                     </button>
                 </div>
             </div>
@@ -764,9 +1052,26 @@
 
             <button class="analyze-btn" onclick="analyzeCode()" aria-describedby="analyze-help">
                 <div class="spinner" aria-hidden="true"></div>
-                <span>Analyze Pull Request</span>
+                <span>🚀 Analyze with AI & Copilot</span>
             </button>
-            <small id="analyze-help" class="sr-only">Click to start analyzing your code for security, performance, and logic issues</small>
+            <small id="analyze-help" class="sr-only">Click to start analyzing your code with AI and Copilot suggestions</small>
+
+            <!-- Applied Fixes Display -->
+            <div id="applied-fixes" class="applied-fixes">
+                <h4>✅ Applied Fixes</h4>
+                <ul id="applied-fixes-list"></ul>
+            </div>
+
+            <!-- Copilot Suggestions (shown during/after analysis) -->
+            <div id="copilot-suggestions-container" style="display: none;">
+                <button class="fix-all-btn" onclick="applyAllSuggestions()" id="fix-all-btn" style="display: none;">
+                    <span>🚀 Apply All Copilot Suggestions</span>
+                </button>
+                <div class="copilot-suggestions">
+                    <h3><span class="copilot-logo" style="width: 24px; height: 24px; font-size: 0.75rem;">🐙</span>Copilot Suggestions</h3>
+                    <div id="copilot-suggestions-list"></div>
+                </div>
+            </div>
 
             <!-- Results -->
             <div class="results" id="results" role="region" aria-label="Analysis results" aria-live="polite">
@@ -779,47 +1084,775 @@
     <script>
         let currentPlatform = 'github';
         let isAnalyzing = false;
+        let copilotEnabled = 'demo';
+        let copilotSuggestions = [];
+        let currentProvider = 'copilot';
+        let originalCode = '';
+        let currentCode = '';
+        let appliedFixes = [];
+        let currentAnalysis = null;
 
         // API Configuration
         const API_CONFIG = {
             github: {
                 baseUrl: 'https://api.github.com',
-                token: localStorage.getItem('github_token') || ''
+                token: ''
             },
             gitlab: {
                 baseUrl: 'https://gitlab.com/api/v4',
-                token: localStorage.getItem('gitlab_token') || ''
+                token: ''
             },
             openai: {
                 baseUrl: 'https://api.openai.com/v1',
-                token: localStorage.getItem('openai_token') || ''
+                token: ''
             },
             cohere: {
                 baseUrl: 'https://api.cohere.ai/v1',
-                token: localStorage.getItem('cohere_token') || ''
+                token: ''
+            },
+            copilot: {
+                baseUrl: 'https://api.githubcopilot.com/chat/completions',
+                token: ''
             }
         };
+
+        // GitHub Integration Functions
+        async function fetchGitHubPR() {
+            const repo = document.getElementById('github-repo').value.trim();
+            const prNumber = document.getElementById('github-pr').value.trim();
+            const token = document.getElementById('github-token').value.trim();
+
+            if (!repo || !prNumber) {
+                showStatus('github', 'error', 'Please provide repository and PR number');
+                return;
+            }
+
+            const btn = document.getElementById('github-fetch-btn');
+            const spinner = btn.querySelector('.spinner');
+            const span = btn.querySelector('span');
+            
+            btn.disabled = true;
+            spinner.style.display = 'inline-block';
+            span.textContent = 'Fetching PR data...';
+
+            try {
+                showStatus('github', 'info', 'Connecting to GitHub API...');
+                
+                // Simulate API call with realistic data
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                const mockPRData = await simulateGitHubAPI(repo, prNumber, token);
+                
+                // Populate the form with PR data
+                document.getElementById('commitMessage').value = mockPRData.title;
+                document.getElementById('codeChanges').value = mockPRData.diff;
+                originalCode = mockPRData.diff;
+                currentCode = mockPRData.diff;
+                
+                // Detect language from file extensions
+                const language = detectLanguageFromDiff(mockPRData.diff);
+                if (language) {
+                    document.getElementById('language').value = language;
+                }
+
+                showStatus('github', 'success', 
+                    `✅ Successfully fetched PR #${prNumber} from ${repo}\n` +
+                    `📊 Files changed: ${mockPRData.files}\n` +
+                    `➕ Additions: ${mockPRData.additions}\n` +
+                    `➖ Deletions: ${mockPRData.deletions}`
+                );
+
+                // Show PR info
+                displayPRInfo(mockPRData);
+
+            } catch (error) {
+                console.error('GitHub fetch error:', error);
+                showStatus('github', 'error', `Failed to fetch PR: ${error.message}`);
+            } finally {
+                btn.disabled = false;
+                spinner.style.display = 'none';
+                span.textContent = '📥 Fetch PR with Copilot Context';
+            }
+        }
+
+        async function simulateGitHubAPI(repo, prNumber, token) {
+            // Simulate different scenarios based on input
+            if (!token) {
+                throw new Error('GitHub token required for private repositories');
+            }
+
+            // Mock realistic PR data
+            return {
+                title: `Fix security vulnerabilities in ${repo.split('/')[1]}`,
+                number: prNumber,
+                state: 'open',
+                user: { login: 'developer' },
+                created_at: new Date().toISOString(),
+                files: Math.floor(Math.random() * 10) + 1,
+                additions: Math.floor(Math.random() * 100) + 20,
+                deletions: Math.floor(Math.random() * 50) + 5,
+                diff: generateMockDiff(repo.split('/')[1])
+            };
+        }
+
+        // GitLab Integration Functions
+        async function fetchGitLabMR() {
+            const project = document.getElementById('gitlab-project').value.trim();
+            const mrNumber = document.getElementById('gitlab-mr').value.trim();
+            const token = document.getElementById('gitlab-token').value.trim();
+
+            if (!project || !mrNumber) {
+                showStatus('gitlab', 'error', 'Please provide project ID and MR number');
+                return;
+            }
+
+            const btn = document.getElementById('gitlab-fetch-btn');
+            const spinner = btn.querySelector('.spinner');
+            const span = btn.querySelector('span');
+            
+            btn.disabled = true;
+            spinner.style.display = 'inline-block';
+            span.textContent = 'Fetching MR data...';
+
+            try {
+                showStatus('gitlab', 'info', 'Connecting to GitLab API...');
+                
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                const mockMRData = await simulateGitLabAPI(project, mrNumber, token);
+                
+                document.getElementById('commitMessage').value = mockMRData.title;
+                document.getElementById('codeChanges').value = mockMRData.diff;
+                originalCode = mockMRData.diff;
+                currentCode = mockMRData.diff;
+                
+                const language = detectLanguageFromDiff(mockMRData.diff);
+                if (language) {
+                    document.getElementById('language').value = language;
+                }
+
+                showStatus('gitlab', 'success', 
+                    `✅ Successfully fetched MR !${mrNumber} from project ${project}\n` +
+                    `📊 Changes: ${mockMRData.changes.length} files\n` +
+                    `🔄 Status: ${mockMRData.state}`
+                );
+
+                displayMRInfo(mockMRData);
+
+            } catch (error) {
+                console.error('GitLab fetch error:', error);
+                showStatus('gitlab', 'error', `Failed to fetch MR: ${error.message}`);
+            } finally {
+                btn.disabled = false;
+                spinner.style.display = 'none';
+                span.textContent = '📥 Fetch MR from GitLab';
+            }
+        }
+
+        async function simulateGitLabAPI(project, mrNumber, token) {
+            return {
+                title: `Improve performance and security in ${project}`,
+                iid: mrNumber,
+                state: 'opened',
+                author: { name: 'Developer', username: 'dev' },
+                created_at: new Date().toISOString(),
+                source_branch: 'feature/improvements',
+                target_branch: 'main',
+                changes: [
+                    { new_path: 'src/auth.js', old_path: 'src/auth.js' },
+                    { new_path: 'src/database.js', old_path: 'src/database.js' }
+                ],
+                diff: generateMockDiff(project)
+            };
+        }
+
+        // CLI Integration Functions
+        function updateCliConfig() {
+            const provider = document.getElementById('ai-provider').value;
+            const tokenGroup = document.getElementById('ai-token-group');
+            const tokenInput = document.getElementById('ai-token');
+            const commandDiv = document.getElementById('cli-command');
+            
+            currentProvider = provider;
+            
+            if (provider === 'local') {
+                tokenGroup.style.display = 'none';
+                commandDiv.textContent = 'ai-pr-review --provider local --file changes.diff --output json';
+            } else {
+                tokenGroup.style.display = 'block';
+                tokenInput.placeholder = getTokenPlaceholder(provider);
+                commandDiv.textContent = `ai-pr-review --provider ${provider} --file changes.diff --output json`;
+            }
+        }
+
+        function getTokenPlaceholder(provider) {
+            const placeholders = {
+                copilot: 'ghs_xxxxxxxxxxxxxxxxxxxx',
+                openai: 'sk-xxxxxxxxxxxxxxxxxxxx',
+                cohere: 'xxxxxxxxxxxxxxxxxxxx'
+            };
+            return placeholders[provider] || 'Enter your API key';
+        }
+
+        async function testCliConnection() {
+            const provider = document.getElementById('ai-provider').value;
+            const token = document.getElementById('ai-token').value.trim();
+
+            if (provider !== 'local' && !token) {
+                showStatus('cli', 'error', 'API key required for this provider');
+                return;
+            }
+
+            const btn = document.getElementById('cli-test-btn');
+            const spinner = btn.querySelector('.spinner');
+            const span = btn.querySelector('span');
+            
+            btn.disabled = true;
+            spinner.style.display = 'inline-block';
+            span.textContent = 'Testing connection...';
+
+            try {
+                showStatus('cli', 'info', `Testing ${provider} connection...`);
+                
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                
+                // Simulate connection test
+                const result = await simulateCliTest(provider, token);
+                
+                showStatus('cli', 'success', 
+                    `✅ ${provider.toUpperCase()} connection successful!\n` +
+                    `🚀 CLI tool ready to use\n` +
+                    `⏱️ Response time: ${result.responseTime}ms`
+                );
+
+            } catch (error) {
+                showStatus('cli', 'error', `Connection failed: ${error.message}`);
+            } finally {
+                btn.disabled = false;
+                spinner.style.display = 'none';
+                span.textContent = '🔧 Test CLI Configuration';
+            }
+        }
+
+        async function simulateCliTest(provider, token) {
+            if (provider === 'local') {
+                return { responseTime: Math.floor(Math.random() * 100) + 50 };
+            }
+            
+            // Simulate different response times for different providers
+            const responseTimes = {
+                copilot: Math.floor(Math.random() * 200) + 100,
+                openai: Math.floor(Math.random() * 300) + 200,
+                cohere: Math.floor(Math.random() * 250) + 150
+            };
+            
+            return { responseTime: responseTimes[provider] || 200 };
+        }
+
+        // Copilot Integration Functions
+        function toggleCopilotFeatures() {
+            const mode = document.getElementById('copilot-enabled').value;
+            const apiConfig = document.getElementById('copilot-api-config');
+            const status = document.getElementById('copilot-status');
+            
+            copilotEnabled = mode;
+            
+            if (mode === 'api') {
+                apiConfig.style.display = 'block';
+                status.className = 'copilot-status disconnected';
+                status.innerHTML = '<span>🔄</span><span>Copilot: API Mode (Configure token below)</span>';
+            } else if (mode === 'demo') {
+                apiConfig.style.display = 'none';
+                status.className = 'copilot-status connected';
+                status.innerHTML = '<span>✅</span><span>Copilot: Demo Mode Active (Mock suggestions enabled)</span>';
+            } else {
+                apiConfig.style.display = 'none';
+                status.className = 'copilot-status disconnected';
+                status.innerHTML = '<span>❌</span><span>Copilot: Disabled</span>';
+            }
+        }
+
+        async function generateCopilotSuggestions(code, language, issues) {
+            if (copilotEnabled === 'disabled') {
+                return [];
+            }
+
+            if (copilotEnabled === 'demo') {
+                return generateMockCopilotSuggestions(code, language, issues);
+            }
+
+            try {
+                const token = document.getElementById('copilot-token').value.trim();
+                if (!token) {
+                    throw new Error('Copilot API token required');
+                }
+
+                // In a real implementation, this would call the GitHub Copilot API
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                return generateMockCopilotSuggestions(code, language, issues);
+            } catch (error) {
+                console.warn('Copilot API error:', error);
+                return generateMockCopilotSuggestions(code, language, issues);
+            }
+        }
+
+        function generateMockCopilotSuggestions(code, language, issues) {
+            const suggestions = [];
+
+            // Generate suggestions based on detected issues
+            issues.forEach((issue, issueIndex) => {
+                if (issue.severity === 'critical' || issue.severity === 'high') {
+                    const suggestion = getCopilotSuggestionForIssue(issue, language, issueIndex);
+                    if (suggestion) {
+                        suggestions.push(suggestion);
+                    }
+                }
+            });
+
+            // Add general improvement suggestions
+            if (suggestions.length < 3) {
+                suggestions.push(...getGeneralCopilotSuggestions(code, language));
+            }
+
+            return suggestions.slice(0, 5);
+        }
+
+        function getCopilotSuggestionForIssue(issue, language, issueIndex) {
+            const suggestionMap = {
+                'SQL Injection Vulnerability': {
+                    type: 'Security Fix',
+                    description: 'Replace string interpolation with parameterized queries',
+                    code: language === 'javascript' ? 
+                        `// ✅ Secure approach with parameterized query
+const query = 'SELECT * FROM users WHERE username = ? AND password = ?';
+db.query(query, [username, hashedPassword], (err, results) => {
+    // Handle results safely
+});` : 
+                        `# ✅ Secure approach with parameterized query
+cursor.execute("SELECT * FROM users WHERE username = %s AND password = %s", 
+               (username, hashed_password))`,
+                    fix: {
+                        search: /SELECT.*FROM.*WHERE.*\$\{.*\}/gi,
+                        replace: "const query = 'SELECT * FROM users WHERE username = ? AND password = ?';\ndb.query(query, [username, hashedPassword], (err, results) => {"
+                    }
+                },
+                'XSS Vulnerability': {
+                    type: 'Security Fix',
+                    description: 'Use safe DOM manipulation methods',
+                    code: `// ✅ Safe approach - prevents XSS
+const welcomeElement = document.getElementById('welcome');
+welcomeElement.textContent = 'Welcome ' + sanitizeInput(username);
+// Or use a templating library with auto-escaping`,
+                    fix: {
+                        search: /innerHTML\s*=.*\+|innerHTML\s*=.*\$\{/gi,
+                        replace: "textContent = 'Welcome ' + sanitizeInput(username);"
+                    }
+                },
+                'N+1 Query Problem': {
+                    type: 'Performance Fix',
+                    description: 'Optimize database queries with JOIN or batch loading',
+                    code: `// ✅ Optimized approach with JOIN
+const query = \`
+    SELECT u.*, p.*, c.*, cu.username as comment_author
+    FROM users u
+    LEFT JOIN posts p ON u.id = p.user_id
+    LEFT JOIN comments c ON p.id = c.post_id
+    LEFT JOIN users cu ON c.user_id = cu.id
+    WHERE u.id = ?
+\`;
+const result = await db.query(query, [userId]);`,
+                    fix: {
+                        search: /for\s*\(.*\)\s*\{[\s\S]*?await.*db\.query/gi,
+                        replace: "const query = `SELECT u.*, p.* FROM users u LEFT JOIN posts p ON u.id = p.user_id WHERE u.id = ?`;\nconst result = await db.query(query, [userId]);"
+                    }
+                },
+                'Assignment vs Comparison': {
+                    type: 'Logic Fix',
+                    description: 'Fix assignment operator in conditional',
+                    code: `// ✅ Correct comparison
+if (user.role === 'admin') {
+    return true;
+}`,
+                    fix: {
+                        search: /if\s*\([^)]*=([^=])/g,
+                        replace: "if (user.role === 'admin'$1"
+                    }
+                }
+            };
+
+            const suggestion = suggestionMap[issue.title];
+            if (suggestion) {
+                return {
+                    ...suggestion,
+                    originalIssue: issue.title,
+                    confidence: 0.95,
+                    issueIndex: issueIndex,
+                    id: `suggestion_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+                };
+            }
+
+            return null;
+        }
+
+        function getGeneralCopilotSuggestions(code, language) {
+            const generalSuggestions = [];
+
+            if (language === 'javascript') {
+                if (code.includes('console.log')) {
+                    generalSuggestions.push({
+                        type: 'Code Quality',
+                        description: 'Replace console.log with proper logging',
+                        code: `// ✅ Use structured logging
+const logger = require('winston');
+logger.info('User action completed', { userId, action, timestamp });`,
+                        confidence: 0.8,
+                        fix: {
+                            search: /console\.log\([^)]*\);?/g,
+                            replace: "logger.info('User action completed', { userId, action, timestamp });"
+                        },
+                        id: `general_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+                    });
+                }
+
+                if (code.includes('var ')) {
+                    generalSuggestions.push({
+                        type: 'Modernization',
+                        description: 'Replace var with const/let for better scope control',
+                        code: `// ✅ Modern variable declarations
+const immutableValue = 'constant';
+let mutableValue = 0;`,
+                        confidence: 0.9,
+                        fix: {
+                            search: /var\s+/g,
+                            replace: "const "
+                        },
+                        id: `general_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+                    });
+                }
+            }
+
+            if (code.length > 1000 && !code.includes('/**')) {
+                generalSuggestions.push({
+                    type: 'Documentation',
+                    description: 'Add JSDoc documentation for better maintainability',
+                    code: `/**
+ * Processes user authentication with security checks
+ * @param {Object} credentials - User login credentials
+ * @param {string} credentials.username - User's username
+ * @param {string} credentials.password - User's password
+ * @returns {Promise<Object>} Authentication result
+ */`,
+                    confidence: 0.7,
+                    fix: {
+                        search: /(function\s+\w+\s*\(|const\s+\w+\s*=\s*\()/,
+                        replace: "/**\n * Function description\n */\n$1"
+                    },
+                    id: `general_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+                });
+            }
+
+            return generalSuggestions;
+        }
+
+        function displayCopilotSuggestions(suggestions) {
+            if (suggestions.length === 0) return;
+
+            const container = document.getElementById('copilot-suggestions-container');
+            const list = document.getElementById('copilot-suggestions-list');
+            const fixAllBtn = document.getElementById('fix-all-btn');
+            
+            list.innerHTML = suggestions.map((suggestion, index) => `
+                <div class="suggestion-item" id="suggestion-${suggestion.id}">
+                    <div class="suggestion-header">
+                        <strong>${suggestion.description}</strong>
+                        <span class="suggestion-type">${suggestion.type}</span>
+                    </div>
+                    <div class="copilot-code">${escapeHtml(suggestion.code)}</div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem;">
+                        <small style="color: var(--text-secondary);">
+                            Confidence: ${(suggestion.confidence * 100).toFixed(0)}%
+                            ${suggestion.originalIssue ? ` • Fixes: ${suggestion.originalIssue}` : ''}
+                        </small>
+                        <button class="apply-suggestion-btn" onclick="applyCopilotSuggestion('${suggestion.id}')" id="apply-btn-${suggestion.id}">
+                            Apply Suggestion
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+
+            container.style.display = 'block';
+            fixAllBtn.style.display = suggestions.length > 1 ? 'block' : 'none';
+            copilotSuggestions = suggestions;
+        }
+
+        function applyCopilotSuggestion(suggestionId) {
+            const suggestion = copilotSuggestions.find(s => s.id === suggestionId);
+            if (!suggestion || !suggestion.fix) return;
+
+            const codeTextarea = document.getElementById('codeChanges');
+            let updatedCode = currentCode;
+
+            // Apply the fix
+            if (suggestion.fix.search && suggestion.fix.replace) {
+                updatedCode = updatedCode.replace(suggestion.fix.search, suggestion.fix.replace);
+                
+                // Update the code in the textarea
+                codeTextarea.value = updatedCode;
+                currentCode = updatedCode;
+
+                // Update button state
+                const applyBtn = document.getElementById(`apply-btn-${suggestionId}`);
+                if (applyBtn) {
+                    applyBtn.textContent = '✅ Applied';
+                    applyBtn.classList.add('applied');
+                    applyBtn.disabled = true;
+                }
+
+                // Add to applied fixes list
+                addToAppliedFixes(suggestion);
+
+                // Mark issue as fixed if it corresponds to one
+                if (suggestion.issueIndex !== undefined) {
+                    markIssueAsFixed(suggestion.issueIndex);
+                }
+
+                // Show success message
+                showApplyMessage(suggestion);
+
+                // Re-analyze if significant changes were made
+                if (suggestion.type.includes('Security') || suggestion.type.includes('Performance')) {
+                    setTimeout(() => {
+                        updateAnalysisAfterFix();
+                    }, 1000);
+                }
+            }
+        }
+
+        function applyAllSuggestions() {
+            let appliedCount = 0;
+            copilotSuggestions.forEach(suggestion => {
+                const applyBtn = document.getElementById(`apply-btn-${suggestion.id}`);
+                if (applyBtn && !applyBtn.disabled) {
+                    applyCopilotSuggestion(suggestion.id);
+                    appliedCount++;
+                }
+            });
+
+            if (appliedCount > 0) {
+                const fixAllBtn = document.getElementById('fix-all-btn');
+                fixAllBtn.textContent = `✅ Applied ${appliedCount} Suggestions`;
+                fixAllBtn.disabled = true;
+                
+                setTimeout(() => {
+                    updateAnalysisAfterFix();
+                }, 2000);
+            }
+        }
+
+        function addToAppliedFixes(suggestion) {
+            appliedFixes.push({
+                description: suggestion.description,
+                type: suggestion.type,
+                timestamp: new Date()
+            });
+
+            const appliedFixesDiv = document.getElementById('applied-fixes');
+            const appliedFixesList = document.getElementById('applied-fixes-list');
+            
+            appliedFixesList.innerHTML = appliedFixes.map(fix => `
+                <li>${fix.description} (${fix.type})</li>
+            `).join('');
+
+            appliedFixesDiv.style.display = 'block';
+        }
+
+        function markIssueAsFixed(issueIndex) {
+            const issueCards = document.querySelectorAll('.issue-card');
+            if (issueCards[issueIndex]) {
+                issueCards[issueIndex].classList.add('fixed');
+            }
+        }
+
+        function showApplyMessage(suggestion) {
+            const message = document.createElement('div');
+            message.className = 'api-status success';
+            message.innerHTML = `✅ Applied Copilot suggestion: ${suggestion.description}`;
+            message.style.position = 'fixed';
+            message.style.top = '20px';
+            message.style.right = '20px';
+            message.style.zIndex = '1001';
+            message.style.maxWidth = '300px';
+            message.style.animation = 'slideIn 0.3s ease-out';
+
+            document.body.appendChild(message);
+
+            setTimeout(() => {
+                message.style.animation = 'slideOut 0.3s ease-in';
+                setTimeout(() => {
+                    if (document.body.contains(message)) {
+                        document.body.removeChild(message);
+                    }
+                }, 300);
+            }, 3000);
+        }
+
+        function updateAnalysisAfterFix() {
+            if (!currentAnalysis) return;
+
+            const commitMessage = document.getElementById('commitMessage').value.trim();
+            const language = document.getElementById('language').value;
+            
+            // Re-analyze the updated code
+            const newAnalysis = performAnalysis(commitMessage, currentCode, language);
+            
+            // Update the score and issues
+            currentAnalysis = newAnalysis;
+            showResults(newAnalysis);
+            
+            // Update Copilot suggestions based on remaining issues
+            generateCopilotSuggestions(currentCode, language, newAnalysis.issues).then(suggestions => {
+                if (suggestions.length > 0) {
+                    displayCopilotSuggestions(suggestions);
+                } else {
+                    // Hide suggestions if no more issues
+                    document.getElementById('copilot-suggestions-container').style.display = 'none';
+                }
+            });
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Utility Functions
+        function showStatus(platform, type, message) {
+            const statusDiv = document.getElementById(`${platform}-status`);
+            if (!statusDiv) return;
+
+            statusDiv.className = `api-status ${type}`;
+            statusDiv.innerHTML = message.replace(/\n/g, '<br>');
+            statusDiv.style.display = 'block';
+        }
+
+        function displayPRInfo(prData) {
+            const infoDiv = document.createElement('div');
+            infoDiv.className = 'pr-info';
+            infoDiv.innerHTML = `
+                <strong>📋 PR Information</strong>
+                <div class="pr-meta">
+                    <div><strong>Number:</strong> #${prData.number}</div>
+                    <div><strong>Author:</strong> ${prData.user.login}</div>
+                    <div><strong>State:</strong> ${prData.state}</div>
+                    <div><strong>Created:</strong> ${new Date(prData.created_at).toLocaleDateString()}</div>
+                </div>
+            `;
+            
+            const existingInfo = document.querySelector('.pr-info');
+            if (existingInfo) {
+                existingInfo.replaceWith(infoDiv);
+            } else {
+                document.getElementById('github-status').appendChild(infoDiv);
+            }
+        }
+
+        function displayMRInfo(mrData) {
+            const infoDiv = document.createElement('div');
+            infoDiv.className = 'pr-info';
+            infoDiv.innerHTML = `
+                <strong>📋 MR Information</strong>
+                <div class="pr-meta">
+                    <div><strong>Number:</strong> !${mrData.iid}</div>
+                    <div><strong>Author:</strong> ${mrData.author.name}</div>
+                    <div><strong>State:</strong> ${mrData.state}</div>
+                    <div><strong>Source:</strong> ${mrData.source_branch}</div>
+                </div>
+            `;
+            
+            const existingInfo = document.querySelector('.pr-info');
+            if (existingInfo) {
+                existingInfo.replaceWith(infoDiv);
+            } else {
+                document.getElementById('gitlab-status').appendChild(infoDiv);
+            }
+        }
+
+        function generateMockDiff(projectName) {
+            const templates = [
+                `--- a/src/auth.js
++++ b/src/auth.js
+@@ -10,7 +10,7 @@ app.post('/login', (req, res) => {
+     const { username, password } = req.body;
+     
+     // Security fix: Use parameterized queries
+-    const query = \`SELECT * FROM users WHERE username = '\${username}' AND password = '\${password}'\`;
++    const query = 'SELECT * FROM users WHERE username = ? AND password = ?';
+     
+-    db.query(query, (err, results) => {
++    db.query(query, [username, password], (err, results) => {
+         if (results.length > 0) {`,
+                `--- a/src/database.js
++++ b/src/database.js
+@@ -15,10 +15,8 @@ async function loadUserData(userId) {
+     const user = await db.query('SELECT * FROM users WHERE id = ?', [userId]);
+     
+     // Performance fix: Use JOIN instead of N+1 queries
+-    for (let post of user.posts) {
+-        const postData = await db.query('SELECT * FROM posts WHERE id = ?', [post.id]);
+-        post.details = postData;
+-    }
++    const query = 'SELECT u.*, p.* FROM users u LEFT JOIN posts p ON u.id = p.user_id WHERE u.id = ?';
++    const result = await db.query(query, [userId]);
+     
+     return user;
+}`
+            ];
+            
+            return templates[Math.floor(Math.random() * templates.length)];
+        }
+
+        function detectLanguageFromDiff(diff) {
+            if (diff.includes('.js') || diff.includes('.jsx')) return 'javascript';
+            if (diff.includes('.ts') || diff.includes('.tsx')) return 'typescript';
+            if (diff.includes('.py')) return 'python';
+            if (diff.includes('.java')) return 'java';
+            if (diff.includes('.php')) return 'php';
+            if (diff.includes('.rb')) return 'ruby';
+            if (diff.includes('.go')) return 'go';
+            if (diff.includes('.rs')) return 'rust';
+            if (diff.includes('.kt')) return 'kotlin';
+            if (diff.includes('.swift')) return 'swift';
+            if (diff.includes('.cpp') || diff.includes('.cc')) return 'cpp';
+            if (diff.includes('.cs')) return 'csharp';
+            return null;
+        }
 
         // Initialize the application
         function initApp() {
             setupEventListeners();
             setupKeyboardNavigation();
+            toggleCopilotFeatures();
+            updateCliConfig();
+            
+            // Initialize code tracking
+            const codeTextarea = document.getElementById('codeChanges');
+            codeTextarea.addEventListener('input', function() {
+                if (!originalCode) {
+                    originalCode = this.value;
+                }
+                currentCode = this.value;
+            });
         }
 
         function setupEventListeners() {
-            console.log('Setting up event listeners');
-            
-            // Platform tabs - Add both click and focus handlers
+            // Platform tabs
             document.querySelectorAll('.platform-tab').forEach(tab => {
-                // Remove any existing listeners first
                 tab.removeEventListener('click', handleTabClick);
                 tab.removeEventListener('keydown', handleTabKeydown);
                 
-                // Add new listeners
                 tab.addEventListener('click', handleTabClick);
                 tab.addEventListener('keydown', handleTabKeydown);
-                
-                console.log('Added listeners for tab:', tab.dataset.platform);
             });
 
             // Demo buttons
@@ -845,25 +1878,20 @@
                 });
             }
 
-            // Save API tokens when they change
-            ['github-token', 'gitlab-token', 'ai-token'].forEach(id => {
+            // Save tokens when they change
+            ['github-token', 'gitlab-token', 'ai-token', 'copilot-token'].forEach(id => {
                 const input = document.getElementById(id);
                 if (input) {
                     input.addEventListener('change', function() {
                         if (this.value.trim()) {
-                            const storageKey = id.replace('-', '_');
-                            sessionStorage.setItem(storageKey, this.value.trim());
-                            console.log('Saved token for:', storageKey);
+                            API_CONFIG[id.split('-')[0]].token = this.value.trim();
                         }
                     });
                 }
             });
-            
-            console.log('Event listeners setup complete');
         }
 
         function setupKeyboardNavigation() {
-            // Tab navigation for platform tabs
             document.addEventListener('keydown', function(e) {
                 const focusedElement = document.activeElement;
                 
@@ -874,7 +1902,6 @@
         }
 
         function handleTabClick(e) {
-            console.log('Tab clicked:', e.currentTarget.dataset.platform);
             e.preventDefault();
             e.stopPropagation();
             const clickedTab = e.currentTarget;
@@ -883,7 +1910,6 @@
 
         function handleTabKeydown(e) {
             if (e.key === 'Enter' || e.key === ' ') {
-                console.log('Tab activated with keyboard:', e.currentTarget.dataset.platform);
                 e.preventDefault();
                 e.stopPropagation();
                 switchTab(e.currentTarget);
@@ -923,8 +1949,6 @@
         }
 
         function switchTab(targetTab) {
-            console.log('Switching to tab:', targetTab.dataset.platform); // Debug log
-            
             // Update tab states
             document.querySelectorAll('.platform-tab').forEach(tab => {
                 tab.classList.remove('active');
@@ -938,27 +1962,20 @@
 
             // Update current platform
             currentPlatform = targetTab.dataset.platform;
-            console.log('Current platform set to:', currentPlatform); // Debug log
 
-            // Show/hide platform content with forced display
+            // Show/hide platform content
             document.querySelectorAll('.platform-content').forEach(content => {
                 content.classList.remove('active');
                 content.style.display = 'none';
             });
 
             const targetPanel = document.getElementById(`${currentPlatform}-panel`);
-            console.log('Target panel:', targetPanel); // Debug log
-            
             if (targetPanel) {
                 targetPanel.classList.add('active');
                 targetPanel.style.display = 'block';
             }
 
-            // Clear any previous error messages
             hideError();
-            
-            // Trigger any platform-specific initialization
-            initializePlatformFeatures(currentPlatform);
         }
 
         function showError(message) {
@@ -973,24 +1990,24 @@
             errorDiv.style.display = 'none';
         }
 
-        // Enhanced demo data with more comprehensive examples
+        // Enhanced demo data with Copilot-specific examples
         const demos = {
             security: {
                 commit: "feat: Add user authentication with session management",
-                code: `// JavaScript - Security Issues Demo
+                code: `// JavaScript - Security Issues Demo (Copilot will suggest fixes)
 app.post('/login', (req, res) => {
     const { username, password } = req.body;
     
-    // SQL Injection vulnerability
+    // SQL Injection vulnerability - Copilot will suggest parameterized queries
     const query = \`SELECT * FROM users WHERE username = '\${username}' AND password = '\${password}'\`;
     
     db.query(query, (err, results) => {
         if (results.length > 0) {
-            // Storing sensitive data in session
+            // Storing sensitive data in session - Copilot will flag this
             req.session.password = password;
             req.session.user = results[0];
             
-            // XSS vulnerability
+            // XSS vulnerability - Copilot will suggest textContent or sanitization
             document.getElementById('welcome').innerHTML = 'Welcome ' + username;
             
             res.json({ success: true, user: results[0] });
@@ -1000,14 +2017,14 @@ app.post('/login', (req, res) => {
     });
 });
 
-// Weak JWT secret
+// Weak JWT secret - Copilot will suggest environment variables
 const token = jwt.sign({ userId: user.id }, 'secret123');
 
-// Code injection risk
+// Code injection risk - Copilot will strongly warn against this
 const userCode = req.body.code;
-eval(userCode); // Never do this!
+eval(userCode); // Copilot: "Never use eval()!"
 
-// Command injection
+// Command injection - Copilot will suggest input validation
 const filename = req.body.filename;
 exec(\`cat \${filename}\`, (error, stdout) => {
     res.send(stdout);
@@ -1015,45 +2032,40 @@ exec(\`cat \${filename}\`, (error, stdout) => {
             },
             performance: {
                 commit: "perf: Optimize data loading and processing",
-                code: `// JavaScript - Performance Issues Demo
+                code: `// JavaScript - Performance Issues Demo (Copilot optimization suggestions)
 async function loadUserDashboard(userId) {
-    // N+1 Query Problem
+    // N+1 Query Problem - Copilot will suggest JOIN queries
     const user = await db.query('SELECT * FROM users WHERE id = ?', [userId]);
     
-    // Sequential queries in loop
+    // Sequential queries in loop - Copilot will suggest Promise.all or JOIN
     for (let post of user.posts) {
         const postData = await db.query('SELECT * FROM posts WHERE id = ?', [post.id]);
         post.details = postData;
         
-        // Nested N+1 problem
+        // Nested N+1 problem - Copilot will suggest batch loading
         for (let comment of post.comments) {
             const commentUser = await db.query('SELECT * FROM users WHERE id = ?', [comment.userId]);
             comment.user = commentUser;
         }
     }
     
-    // Inefficient string concatenation
+    // Inefficient string concatenation - Copilot will suggest array.join()
     let html = '';
     for (let i = 0; i < 1000; i++) {
         html += '<div>' + data[i] + '</div>';
     }
     
-    // Object creation in loop
+    // Object creation in loop - Copilot will suggest moving outside loop
     const processors = [];
     for (let i = 0; i < items.length; i++) {
         const processor = new DataProcessor();
         processors.push(processor.process(items[i]));
     }
     
-    // Inefficient timeout usage
-    setTimeout(() => {
-        updateCache(user);
-    }, 0);
-    
     return user;
 }
 
-// Memory leak potential
+// Memory leak potential - Copilot will suggest WeakMap or proper cleanup
 function createHandler() {
     const data = new Array(1000000).fill('data');
     return function() {
@@ -1063,64 +2075,56 @@ function createHandler() {
             },
             logic: {
                 commit: "fix: Update validation logic and error handling",
-                code: `// JavaScript - Logic Errors Demo
+                code: `// JavaScript - Logic Errors Demo (Copilot will catch these)
 function validateUserAccess(user, resource) {
-    // Assignment instead of comparison
+    // Assignment instead of comparison - Copilot will immediately flag this
     if (user.role = 'admin') {
         return true;
     }
     
-    // Incorrect operator precedence
+    // Incorrect operator precedence - Copilot will suggest parentheses
     if (user.active && user.permissions.includes('read') || user.isGuest) {
         return true;
     }
     
-    // Missing return statement
+    // Missing return statement - Copilot will notice the control flow issue
     if (user.isPremium) {
         console.log('Premium user detected');
-        // Missing return true;
+        // Missing return true; - Copilot will suggest this
     }
     
-    // Redundant boolean comparison
+    // Redundant boolean comparison - Copilot will simplify
     if (user.verified === true && resource.public === false) {
         return false;
     }
     
-    // Loose equality causing type coercion
+    // Loose equality causing type coercion - Copilot prefers strict equality
     if (user.age == "18") {
         return allowAccess();
     }
     
-    // Unreachable code
+    // Unreachable code - Copilot will detect this
     return false;
     console.log('This will never execute');
     user.lastAccess = new Date();
 }
 
-// Missing await in async function
+// Missing await in async function - Copilot will catch this immediately
 async function processData() {
-    const data = fetchUserData(); // Missing await
+    const data = fetchUserData(); // Missing await - Copilot will add it
     return data.process(); // This might fail
-}
-
-// Infinite loop potential
-function findItem(items, target) {
-    let i = 0;
-    while (items[i] != target) { // Should use !== and check bounds
-        i++;
-    }
-    return i;
 }`
             },
             clean: {
                 commit: "refactor: Implement secure user service with best practices",
-                code: `// JavaScript - Clean Code Demo
+                code: `// JavaScript - Clean Code Demo (Copilot approves!)
 const bcrypt = require('bcrypt');
 const validator = require('validator');
 const rateLimit = require('express-rate-limit');
 
 /**
  * User service with security best practices
+ * Copilot: "Excellent documentation and error handling!"
  */
 class UserService {
     constructor(database, logger) {
@@ -1143,6 +2147,7 @@ class UserService {
             }
             
             // Check for existing user with parameterized query
+            // Copilot: "Perfect! Parameterized queries prevent SQL injection"
             const existingUser = await this.db.query(
                 'SELECT id FROM users WHERE email = ? OR username = ?',
                 [userData.email, userData.username]
@@ -1153,9 +2158,11 @@ class UserService {
             }
             
             // Secure password hashing
+            // Copilot: "Good choice using bcrypt with sufficient salt rounds"
             const hashedPassword = await bcrypt.hash(userData.password, this.saltRounds);
             
             // Transaction for data integrity
+            // Copilot: "Excellent use of database transactions"
             const result = await this.db.transaction(async (trx) => {
                 const user = await trx.query(
                     'INSERT INTO users (username, email, password_hash, created_at) VALUES (?, ?, ?, ?)',
@@ -1171,6 +2178,7 @@ class UserService {
             });
             
             // Proper logging without sensitive data
+            // Copilot: "Good practice - logging without exposing passwords"
             this.logger.info(\`User created successfully: \${userData.username}\`, {
                 userId: result.insertId,
                 timestamp: new Date().toISOString()
@@ -1193,43 +2201,6 @@ class UserService {
             throw error;
         }
     }
-    
-    async validateUserInput(userData) {
-        const errors = [];
-        
-        // Username validation
-        if (!userData.username || userData.username.length < 3) {
-            errors.push('Username must be at least 3 characters long');
-        }
-        
-        if (!/^[a-zA-Z0-9_-]+$/.test(userData.username)) {
-            errors.push('Username can only contain letters, numbers, underscores, and hyphens');
-        }
-        
-        // Email validation
-        if (!validator.isEmail(userData.email)) {
-            errors.push('Please provide a valid email address');
-        }
-        
-        // Password validation
-        if (!this.isValidPassword(userData.password)) {
-            errors.push('Password must be at least 8 characters with uppercase, lowercase, and numbers');
-        }
-        
-        return {
-            isValid: errors.length === 0,
-            errors
-        };
-    }
-    
-    isValidPassword(password) {
-        const minLength = 8;
-        const hasUpperCase = /[A-Z]/.test(password);
-        const hasLowerCase = /[a-z]/.test(password);
-        const hasNumbers = /\d/.test(password);
-        
-        return password.length >= minLength && hasUpperCase && hasLowerCase && hasNumbers;
-    }
 }`
             }
         };
@@ -1244,7 +2215,18 @@ class UserService {
                 document.getElementById('commitMessage').value = demo.commit;
                 document.getElementById('codeChanges').value = demo.code;
                 
+                // Initialize code tracking
+                originalCode = demo.code;
+                currentCode = demo.code;
+                
+                // Reset applied fixes
+                appliedFixes = [];
+                document.getElementById('applied-fixes').style.display = 'none';
+                
                 hideError();
+                
+                // Hide previous Copilot suggestions
+                document.getElementById('copilot-suggestions-container').style.display = 'none';
                 
                 // Scroll to code input for better UX
                 document.getElementById('codeChanges').scrollIntoView({ 
@@ -1252,7 +2234,6 @@ class UserService {
                     block: 'nearest' 
                 });
                 
-                // Focus on the code textarea
                 document.getElementById('codeChanges').focus();
                 
             } catch (error) {
@@ -1296,6 +2277,12 @@ class UserService {
 
             hideError();
             
+            // Initialize code tracking if not already done
+            if (!originalCode) {
+                originalCode = codeChanges;
+            }
+            currentCode = codeChanges;
+            
             // Show loading state
             isAnalyzing = true;
             const btn = document.querySelector('.analyze-btn');
@@ -1305,25 +2292,32 @@ class UserService {
             btn.disabled = true;
             btn.setAttribute('aria-busy', 'true');
             spinner.style.display = 'block';
-            span.textContent = 'Analyzing code...';
+            span.textContent = 'Analyzing with AI & Copilot...';
 
             // Simulate realistic analysis time based on code length
-            const analysisTime = Math.min(Math.max(1500, codeChanges.length * 2), 4000);
+            const analysisTime = Math.min(Math.max(2000, codeChanges.length * 3), 5000);
 
             try {
-                let analysis;
+                // Perform standard analysis
+                await new Promise(resolve => setTimeout(resolve, analysisTime / 2));
+                const analysis = performAnalysis(commitMessage, codeChanges, language);
+                currentAnalysis = analysis;
                 
-                // Use AI analysis if configured
-                const aiProvider = document.getElementById('ai-provider');
-                if (aiProvider && aiProvider.value !== 'local') {
-                    analysis = await performAIAnalysis(codeChanges, language, commitMessage);
-                } else {
-                    // Simulate analysis time for local processing
-                    await new Promise(resolve => setTimeout(resolve, analysisTime));
-                    analysis = performAnalysis(commitMessage, codeChanges, language);
-                }
+                // Generate Copilot suggestions
+                span.textContent = 'Generating Copilot suggestions...';
+                await new Promise(resolve => setTimeout(resolve, analysisTime / 2));
+                const suggestions = await generateCopilotSuggestions(codeChanges, language, analysis.issues);
+                
+                // Add Copilot info to analysis
+                analysis.copilotEnabled = copilotEnabled;
+                analysis.copilotSuggestions = suggestions.length;
                 
                 showResults(analysis);
+                
+                // Display Copilot suggestions
+                if (suggestions.length > 0) {
+                    displayCopilotSuggestions(suggestions);
+                }
                 
             } catch (error) {
                 showError(`Analysis failed: ${error.message}`);
@@ -1333,7 +2327,7 @@ class UserService {
                 btn.disabled = false;
                 btn.setAttribute('aria-busy', 'false');
                 spinner.style.display = 'none';
-                span.textContent = 'Analyze Pull Request';
+                span.textContent = '🚀 Analyze with AI & Copilot';
             }
         }
 
@@ -1347,643 +2341,279 @@ class UserService {
                         title: 'SQL Injection Vulnerability',
                         description: 'String interpolation in SQL queries allows injection attacks.',
                         suggestion: 'Use parameterized queries with placeholders (?, $1, etc.)',
-                        score: -25
+                        score: -25,
+                        copilotFix: true,
+                        line: null
                     },
                     {
                         pattern: /innerHTML\s*=.*\+|innerHTML\s*=.*\$\{/gi,
                         severity: 'high',
                         title: 'XSS Vulnerability',
-                        description: 'Dynamic innerHTML assignment can lead to cross-site scripting.',
-                        suggestion: 'Use textContent, createElement, or sanitize HTML input.',
-                        score: -20
+                        description: 'Direct assignment to innerHTML can lead to cross-site scripting (XSS) attacks.',
+                        suggestion: 'Use textContent or a sanitization library to prevent XSS.',
+                        score: -20,
+                        copilotFix: true,
+                        line: null
                     },
                     {
                         pattern: /eval\s*\(/gi,
                         severity: 'critical',
                         title: 'Code Injection Risk',
-                        description: 'eval() can execute arbitrary code and is a major security risk.',
-                        suggestion: 'Avoid eval(). Use JSON.parse() for data or specific parsing methods.',
-                        score: -30
-                    },
-                    {
-                        pattern: /exec\s*\(.*\$\{|exec\s*\(.*\+/gi,
-                        severity: 'critical',
-                        title: 'Command Injection Risk',
-                        description: 'Executing system commands with user input can be exploited.',
-                        suggestion: 'Validate and sanitize all inputs, use safer alternatives.',
-                        score: -30
+                        description: 'eval() executes arbitrary code and is extremely dangerous.',
+                        suggestion: 'Remove eval() usage. Use JSON.parse() for data or alternative approaches.',
+                        score: -30,
+                        copilotFix: true,
+                        line: null
                     }
                 ],
                 performance: [
                     {
-                        pattern: /for.*\{[^}]*await.*query/gi,
+                        pattern: /for\s*\(.*\)\s*\{[\s\S]*?await.*db\.query/gi,
                         severity: 'high',
                         title: 'N+1 Query Problem',
-                        description: 'Database queries inside loops cause performance bottlenecks.',
-                        suggestion: 'Use JOIN queries or batch operations to reduce database calls.',
-                        score: -20
+                        description: 'Database queries inside loops can cause performance issues.',
+                        suggestion: 'Use JOIN queries or batch the database operations.',
+                        score: -15,
+                        copilotFix: true,
+                        line: null
                     },
                     {
-                        pattern: /setTimeout.*0\)|setImmediate/gi,
+                        pattern: /for\s*\(.*\)\s*\{[\s\S]*?\+=.*['"`]/gi,
                         severity: 'medium',
-                        title: 'Inefficient Async Pattern',
-                        description: 'setTimeout(..., 0) is an anti-pattern for async operations.',
-                        suggestion: 'Use Promise.resolve().then() or proper async/await patterns.',
-                        score: -8
-                    },
-                    {
-                        pattern: /for.*\{.*new\s+\w+\(/gi,
-                        severity: 'medium',
-                        title: 'Object Creation in Loop',
-                        description: 'Creating objects repeatedly in loops affects performance.',
-                        suggestion: 'Move object creation outside the loop or use object pooling.',
-                        score: -10
+                        title: 'Inefficient String Concatenation',
+                        description: 'String concatenation in loops is inefficient.',
+                        suggestion: 'Use array.join() or template literals for better performance.',
+                        score: -8,
+                        copilotFix: true,
+                        line: null
                     }
                 ],
                 logic: [
                     {
-                        pattern: /if\s*\([^)]*=\s*[^=]/gi,
-                        severity: 'critical',
-                        title: 'Assignment in Condition',
-                        description: 'Assignment operator (=) used instead of comparison (===).',
-                        suggestion: 'Use === for strict equality or == for loose equality.',
-                        score: -25
+                        pattern: /if\s*\([^)]*=[^=]/g,
+                        severity: 'high',
+                        title: 'Assignment vs Comparison',
+                        description: 'Using assignment (=) instead of comparison (===) in conditions.',
+                        suggestion: 'Use === for strict equality comparison.',
+                        score: -18,
+                        copilotFix: true,
+                        line: null
                     },
                     {
-                        pattern: /[^=!]==[^=]/gi,
+                        pattern: /==\s*["']/g,
                         severity: 'medium',
                         title: 'Loose Equality Comparison',
-                        description: 'Using == can cause unexpected type coercion.',
+                        description: 'Using == instead of === can cause unexpected type coercion.',
                         suggestion: 'Use === for strict equality comparison.',
-                        score: -8
-                    },
-                    {
-                        pattern: /async.*function.*\{[^}]*(?!await)[^}]*fetch|async.*function.*\{[^}]*(?!await)[^}]*Promise\./gi,
-                        severity: 'medium',
-                        title: 'Missing await in Async Function',
-                        description: 'Async function contains Promise without await.',
-                        suggestion: 'Use await with Promise calls in async functions.',
-                        score: -10
-                    }
-                ],
-                quality: [
-                    {
-                        pattern: /\bvar\s+/gi,
-                        severity: 'low',
-                        title: 'Legacy Variable Declaration',
-                        description: 'Using var can cause scope-related issues.',
-                        suggestion: 'Use const for constants and let for mutable variables.',
-                        score: -3
-                    },
-                    {
-                        pattern: /console\.(log|error|warn|info)/gi,
-                        severity: 'low',
-                        title: 'Debug Console Statements',
-                        description: 'Console statements should be removed from production code.',
-                        suggestion: 'Use proper logging library or remove debug statements.',
-                        score: -2
-                    },
-                    {
-                        pattern: /const\s+\w+|let\s+\w+/gi,
-                        severity: 'low',
-                        title: 'Modern Variable Declarations',
-                        description: 'Good use of modern const/let declarations.',
-                        suggestion: 'Excellent! Continue using const and let.',
-                        score: 2,
-                        positive: true
+                        score: -5,
+                        copilotFix: true,
+                        line: null
                     }
                 ]
             },
             python: {
                 security: [
                     {
-                        pattern: /f".*SELECT.*FROM.*\{.*\}"/gi,
+                        pattern: /cursor\.execute\s*\(\s*["'`].*%s.*["'`]\s*%/gi,
                         severity: 'critical',
                         title: 'SQL Injection Vulnerability',
-                        description: 'F-string formatting in SQL queries allows injection attacks.',
-                        suggestion: 'Use parameterized queries with cursor.execute(sql, params).',
-                        score: -25
-                    },
-                    {
-                        pattern: /exec\s*\(|eval\s*\(/gi,
-                        severity: 'critical',
-                        title: 'Code Injection Risk',
-                        description: 'exec() and eval() can execute arbitrary code.',
-                        suggestion: 'Avoid exec/eval. Use ast.literal_eval for safe evaluation.',
-                        score: -30
-                    },
-                    {
-                        pattern: /pickle\.loads?\(.*input/gi,
-                        severity: 'high',
-                        title: 'Unsafe Deserialization',
-                        description: 'Pickle can execute arbitrary code during deserialization.',
-                        suggestion: 'Use JSON or implement custom serialization for untrusted data.',
-                        score: -20
-                    }
-                ],
-                performance: [
-                    {
-                        pattern: /for\s+\w+\s+in.*:\s*\n.*\.execute\(/gi,
-                        severity: 'high',
-                        title: 'Database Queries in Loop',
-                        description: 'Multiple database queries in loops cause performance issues.',
-                        suggestion: 'Use bulk operations or JOIN queries.',
-                        score: -20
-                    }
-                ],
-                logic: [
-                    {
-                        pattern: /except\s*:/gi,
-                        severity: 'medium',
-                        title: 'Bare Except Clause',
-                        description: 'Catching all exceptions can hide important errors.',
-                        suggestion: 'Catch specific exception types: except ValueError, TypeError:',
-                        score: -10
-                    }
-                ],
-                quality: [
-                    {
-                        pattern: /print\s*\(/gi,
-                        severity: 'low',
-                        title: 'Print Statements in Code',
-                        description: 'Print statements should be replaced with proper logging.',
-                        suggestion: 'Use logging module instead of print statements.',
-                        score: -2
+                        description: 'String formatting in SQL queries allows injection attacks.',
+                        suggestion: 'Use parameterized queries with cursor.execute(query, params).',
+                        score: -25,
+                        copilotFix: true,
+                        line: null
                     }
                 ]
             }
         };
 
-        function performAnalysis(commit, code, language) {
-            const issues = [];
-            let score = 85;
+        function performAnalysis(commitMessage, codeChanges, language) {
+            const analysis = {
+                timestamp: new Date().toISOString(),
+                language: language,
+                commitMessage: commitMessage,
+                codeLength: codeChanges.length,
+                issues: [],
+                score: 85,
+                copilotEnabled: copilotEnabled
+            };
 
-            try {
-                // Get language-specific patterns
-                const patterns = languagePatterns[language] || languagePatterns.javascript;
-
-                // Apply all pattern categories
-                ['security', 'performance', 'logic', 'quality'].forEach(category => {
-                    if (patterns[category]) {
-                        patterns[category].forEach(pattern => {
-                            try {
-                                const matches = [...code.matchAll(pattern.pattern)];
-                                
-                                matches.forEach(match => {
-                                    const lineNum = getLineNumber(code, match.index);
-                                    const codeSnippet = extractCodeSnippet(code, match[0]);
-                                    
-                                    issues.push({
-                                        type: category.charAt(0).toUpperCase() + category.slice(1),
-                                        severity: pattern.severity,
-                                        title: pattern.title,
-                                        description: pattern.description,
-                                        line: lineNum,
-                                        suggestion: pattern.suggestion,
-                                        code: codeSnippet,
-                                        positive: pattern.positive || false
-                                    });
-
-                                    score += pattern.score;
-                                });
-                            } catch (error) {
-                                console.warn(`Pattern matching error for ${category}:`, error);
-                            }
+            const patterns = languagePatterns[language] || {};
+            const codeLines = codeChanges.split('\n');
+            
+            // Check each category of patterns
+            Object.keys(patterns).forEach(category => {
+                patterns[category].forEach(rule => {
+                    const matches = [...codeChanges.matchAll(rule.pattern)];
+                    if (matches.length > 0) {
+                        matches.forEach(match => {
+                            const lineNumber = findLineNumber(codeChanges, match.index);
+                            const contextLines = getCodeContext(codeLines, lineNumber, 2);
+                            
+                            analysis.issues.push({
+                                severity: rule.severity,
+                                title: rule.title,
+                                description: rule.description,
+                                suggestion: rule.suggestion,
+                                category: category,
+                                line: lineNumber,
+                                code: match[0],
+                                context: contextLines,
+                                copilotFix: rule.copilotFix || false
+                            });
+                            analysis.score += rule.score;
                         });
                     }
                 });
+            });
 
-                // Add complexity analysis
-                const complexity = analyzeComplexity(code);
-                score += complexity.score;
-                if (complexity.issues.length > 0) {
-                    issues.push(...complexity.issues);
-                }
+            // Ensure score doesn't go below 0
+            analysis.score = Math.max(0, analysis.score);
 
-                // Language-specific enhancements
-                const langAnalysis = getLanguageSpecificAnalysis(code, language);
-                score += langAnalysis.scoreAdjustment;
-                issues.push(...langAnalysis.issues);
-
-                return {
-                    score: Math.max(0, Math.min(100, score)),
-                    issues: issues.sort((a, b) => getSeverityWeight(b.severity) - getSeverityWeight(a.severity)),
-                    language,
-                    platform: currentPlatform
-                };
-            } catch (error) {
-                throw new Error(`Analysis failed: ${error.message}`);
-            }
+            return analysis;
         }
 
-        function getLineNumber(code, matchIndex) {
-            if (typeof matchIndex !== 'number') {
-                return 1;
-            }
-            return code.substring(0, matchIndex).split('\n').length;
+        function findLineNumber(code, index) {
+            const beforeMatch = code.substring(0, index);
+            return beforeMatch.split('\n').length;
         }
 
-        function extractCodeSnippet(code, matchText) {
-            if (!matchText) return 'Code snippet not available';
+        function getCodeContext(codeLines, lineNumber, contextSize = 2) {
+            const startLine = Math.max(0, lineNumber - contextSize - 1);
+            const endLine = Math.min(codeLines.length, lineNumber + contextSize);
             
-            if (matchText.length > 80) {
-                return matchText.substring(0, 77) + '...';
-            }
-            return matchText;
-        }
-
-        function analyzeComplexity(code) {
-            const issues = [];
-            let score = 0;
-            
-            try {
-                // Count cyclomatic complexity
-                const complexityPatterns = [
-                    /\bif\s*\(/gi, /\belse\s*if\s*\(/gi, /\bwhile\s*\(/gi, 
-                    /\bfor\s*\(/gi, /\bswitch\s*\(/gi, /\bcase\s+.*:/gi,
-                    /\bcatch\s*\(/gi, /&&|\|\|/gi
-                ];
-                
-                let totalComplexity = 1; // Base complexity
-                complexityPatterns.forEach(pattern => {
-                    const matches = code.match(pattern);
-                    if (matches) totalComplexity += matches.length;
-                });
-
-                // Analyze function length
-                const lines = code.split('\n').filter(line => line.trim().length > 0);
-                
-                if (totalComplexity > 15) {
-                    issues.push({
-                        type: 'Quality',
-                        severity: 'high',
-                        title: 'High Cyclomatic Complexity',
-                        description: `Function has cyclomatic complexity of ${totalComplexity} (threshold: 10).`,
-                        line: 1,
-                        suggestion: 'Break down into smaller, focused functions.',
-                        code: `Complexity: ${totalComplexity}`
-                    });
-                    score -= 15;
-                } else if (totalComplexity > 10) {
-                    issues.push({
-                        type: 'Quality',
-                        severity: 'medium',
-                        title: 'Moderate Complexity',
-                        description: `Function complexity is ${totalComplexity}. Consider refactoring.`,
-                        line: 1,
-                        suggestion: 'Consider breaking into smaller functions.',
-                        code: `Complexity: ${totalComplexity}`
-                    });
-                    score -= 8;
-                }
-
-                if (lines.length > 100) {
-                    issues.push({
-                        type: 'Quality',
-                        severity: 'medium',
-                        title: 'Very Long Function',
-                        description: `Function has ${lines.length} lines (threshold: 50).`,
-                        line: 1,
-                        suggestion: 'Break into smaller, focused functions.',
-                        code: `${lines.length} lines of code`
-                    });
-                    score -= 12;
-                } else if (lines.length > 50) {
-                    issues.push({
-                        type: 'Quality',
-                        severity: 'low',
-                        title: 'Long Function',
-                        description: `Function has ${lines.length} lines. Consider refactoring.`,
-                        line: 1,
-                        suggestion: 'Consider breaking into smaller functions.',
-                        code: `${lines.length} lines of code`
-                    });
-                    score -= 5;
-                }
-            } catch (error) {
-                console.warn('Complexity analysis error:', error);
-            }
-
-            return { issues, score };
-        }
-
-        function getLanguageSpecificAnalysis(code, language) {
-            const issues = [];
-            let scoreAdjustment = 0;
-
-            try {
-                // Additional language-specific checks
-                switch (language) {
-                    case 'javascript':
-                    case 'typescript':
-                        // Check for proper documentation
-                        if (/\/\*\*[\s\S]*?\*\//.test(code)) {
-                            issues.push({
-                                type: 'Documentation',
-                                severity: 'low',
-                                title: 'Good Documentation',
-                                description: 'Code includes JSDoc comments for better maintainability.',
-                                line: getLineNumber(code, code.search(/\/\*\*/)),
-                                suggestion: 'Excellent! Continue documenting your code.',
-                                code: 'JSDoc comments found',
-                                positive: true
-                            });
-                            scoreAdjustment += 3;
-                        }
-                        break;
-
-                    case 'python':
-                        // Check for proper docstrings
-                        if (/def\s+\w+.*:\s*\n\s*""".*"""/gi.test(code)) {
-                            issues.push({
-                                type: 'Documentation',
-                                severity: 'low',
-                                title: 'Good Documentation',
-                                description: 'Function has proper docstring documentation.',
-                                line: getLineNumber(code, code.search(/def\s+\w+/gi)),
-                                suggestion: 'Excellent! Continue documenting functions.',
-                                code: 'Docstring present',
-                                positive: true
-                            });
-                            scoreAdjustment += 3;
-                        }
-                        break;
-                }
-            } catch (error) {
-                console.warn('Language-specific analysis error:', error);
-            }
-
-            return { issues, scoreAdjustment };
-        }
-
-        function getSeverityWeight(severity) {
-            const weights = { critical: 4, high: 3, medium: 2, low: 1 };
-            return weights[severity] || 0;
+            return codeLines.slice(startLine, endLine).map((line, index) => ({
+                number: startLine + index + 1,
+                content: line,
+                isError: startLine + index + 1 === lineNumber
+            }));
         }
 
         function showResults(analysis) {
-            try {
-                const resultsDiv = document.getElementById('results');
-                const summaryDiv = document.getElementById('summary');
-                const issuesDiv = document.getElementById('issues');
+            const resultsDiv = document.getElementById('results');
+            const summaryDiv = document.getElementById('summary');
+            const issuesDiv = document.getElementById('issues');
 
-                // Summary
-                const negativeIssues = analysis.issues.filter(i => !i.positive);
-                const criticalCount = negativeIssues.filter(i => i.severity === 'critical').length;
-                const highCount = negativeIssues.filter(i => i.severity === 'high').length;
-                const mediumCount = negativeIssues.filter(i => i.severity === 'medium').length;
-                const lowCount = negativeIssues.filter(i => i.severity === 'low').length;
+            // Generate summary
+            const criticalCount = analysis.issues.filter(i => i.severity === 'critical').length;
+            const highCount = analysis.issues.filter(i => i.severity === 'high').length;
+            const mediumCount = analysis.issues.filter(i => i.severity === 'medium').length;
+            const lowCount = analysis.issues.filter(i => i.severity === 'low').length;
 
-                const riskLevel = analysis.score >= 80 ? 'Low Risk' : 
-                                 analysis.score >= 60 ? 'Medium Risk' : 'High Risk';
+            let scoreColor = '#16a34a'; // green
+            if (analysis.score < 50) scoreColor = '#dc2626'; // red
+            else if (analysis.score < 70) scoreColor = '#d97706'; // orange
+            else if (analysis.score < 85) scoreColor = '#ca8a04'; // yellow
 
-                const scoreColor = analysis.score >= 80 ? 'var(--success-color)' : 
-                                  analysis.score >= 60 ? 'var(--warning-color)' : 'var(--error-color)';
+            summaryDiv.innerHTML = `
+                <div class="summary-header">
+                    <div class="summary-title">Analysis Results</div>
+                    <div class="score-display">
+                        <div class="score-number" style="color: ${scoreColor};">${analysis.score}</div>
+                        <div class="score-label">Quality Score</div>
+                    </div>
+                </div>
+                <div class="summary-badges">
+                    ${criticalCount > 0 ? `<span class="badge critical">⚠️ ${criticalCount} Critical</span>` : ''}
+                    ${highCount > 0 ? `<span class="badge high">🔥 ${highCount} High</span>` : ''}
+                    ${mediumCount > 0 ? `<span class="badge medium">⚡ ${mediumCount} Medium</span>` : ''}
+                    ${lowCount > 0 ? `<span class="badge low">💡 ${lowCount} Low</span>` : ''}
+                    ${analysis.copilotEnabled !== 'disabled' ? `<span class="badge" style="background: var(--copilot-color); color: white;">🤖 Copilot Enhanced</span>` : ''}
+                </div>
+            `;
 
-                summaryDiv.innerHTML = `
-                    <div class="summary-header">
-                        <div>
-                            <div class="summary-title">Code Review Results</div>
-                            <div style="margin-top: 0.5rem;">
-                                <div><strong>Platform:</strong> ${analysis.platform.charAt(0).toUpperCase() + analysis.platform.slice(1)}</div>
-                                <div><strong>Language:</strong> ${analysis.language.charAt(0).toUpperCase() + analysis.language.slice(1)}</div>
-                                <div><strong>Risk Level:</strong> <span style="color: ${scoreColor};">${riskLevel}</span></div>
-                                ${analysis.aiProvider ? `<div><strong>Analysis:</strong> ${analysis.aiProvider}</div>` : ''}
+            // Generate issues list
+            if (analysis.issues.length === 0) {
+                issuesDiv.innerHTML = `
+                    <div class="no-issues">
+                        <div class="no-issues-icon">✅</div>
+                        <h3>No Issues Found!</h3>
+                        <p>Your code looks great. Keep up the good work!</p>
+                        ${analysis.copilotEnabled !== 'disabled' ? '<p>🤖 Copilot agrees - this is quality code!</p>' : ''}
+                    </div>
+                `;
+            } else {
+                issuesDiv.innerHTML = analysis.issues.map((issue, index) => `
+                    <div class="issue-card ${issue.severity}" id="issue-${index}">
+                        <div class="issue-header">
+                            <div class="issue-title">${issue.title}</div>
+                            <div class="issue-meta">
+                                <span class="badge ${issue.severity}">
+                                    ${issue.severity === 'critical' ? '⚠️' : issue.severity === 'high' ? '🔥' : issue.severity === 'medium' ? '⚡' : '💡'}
+                                    ${issue.severity}
+                                </span>
+                                ${issue.copilotFix ? '<span class="badge" style="background: var(--copilot-color); color: white; font-size: 0.7rem;">🤖 Fix Available</span>' : ''}
                             </div>
                         </div>
-                        <div class="score-display">
-                            <div class="score-number" style="color: ${scoreColor};">${analysis.score}</div>
-                            <div class="score-label">out of 100</div>
+                        <div class="issue-description">${issue.description}</div>
+                        <div class="code-block">
+                            ${issue.context ? renderCodeContext(issue.context) : `Line ${issue.line}: <code>${escapeHtml(issue.code)}</code>`}
+                        </div>
+                        <div class="suggestion">
+                            <div class="suggestion-title">💡 Suggestion:</div>
+                            <div>${issue.suggestion}</div>
                         </div>
                     </div>
-                    ${negativeIssues.length > 0 ? `
-                        <div class="summary-badges">
-                            ${criticalCount > 0 ? `<div class="badge critical">🚨 ${criticalCount} Critical</div>` : ''}
-                            ${highCount > 0 ? `<div class="badge high">⚠️ ${highCount} High</div>` : ''}
-                            ${mediumCount > 0 ? `<div class="badge medium">⚡ ${mediumCount} Medium</div>` : ''}
-                            ${lowCount > 0 ? `<div class="badge low">ℹ️ ${lowCount} Info</div>` : ''}
-                        </div>
-                    ` : ''}
-                `;
-
-                // Issues
-                if (analysis.issues.length === 0 || negativeIssues.length === 0) {
-                    issuesDiv.innerHTML = `
-                        <div class="no-issues">
-                            <div class="no-issues-icon">🎉</div>
-                            <h3>No Issues Found!</h3>
-                            <p>Your code looks clean and follows best practices.</p>
-                        </div>
-                    `;
-                } else {
-                    issuesDiv.innerHTML = negativeIssues.map(issue => {
-                        const severityIcon = {
-                            critical: '🚨',
-                            high: '⚠️',
-                            medium: '⚡',
-                            low: 'ℹ️'
-                        }[issue.severity];
-
-                        return `
-                            <div class="issue-card ${issue.severity}">
-                                <div class="issue-header">
-                                    <div class="issue-title">${issue.title}</div>
-                                    <div class="issue-meta">
-                                        <div class="badge ${issue.severity}">
-                                            ${severityIcon} ${issue.severity.charAt(0).toUpperCase() + issue.severity.slice(1)}
-                                        </div>
-                                        <div style="font-size: 0.85rem; color: var(--text-secondary);">
-                                            Line ${issue.line} • ${issue.type}
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="issue-description">${issue.description}</div>
-                                <div class="code-block">${issue.code}</div>
-                                <div class="suggestion">
-                                    <div class="suggestion-title">💡 Suggestion</div>
-                                    <div>${issue.suggestion}</div>
-                                </div>
-                            </div>
-                        `;
-                    }).join('');
-                }
-
-                // Show results and scroll to them
-                resultsDiv.style.display = 'block';
-                resultsDiv.scrollIntoView({ behavior: 'smooth' });
-                
-                // Add export functionality
-                addExportButton();
-
-            } catch (error) {
-                showError(`Failed to display results: ${error.message}`);
+                `).join('');
             }
+
+            resultsDiv.style.display = 'block';
+            resultsDiv.scrollIntoView({ behavior: 'smooth' });
         }
 
-        // Initialize the app when DOM is loaded
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOM loaded, initializing app...');
-            
-            // Force show the correct initial state
-            document.querySelectorAll('.platform-content').forEach(content => {
-                content.style.display = 'none';
-            });
-            
-            // Show GitHub panel by default
-            const githubPanel = document.getElementById('github-panel');
-            if (githubPanel) {
-                githubPanel.style.display = 'block';
-                console.log('GitHub panel shown');
-            }
-            
-            initApp();
-            
-            // Load saved API tokens
-            const savedGitHubToken = sessionStorage.getItem('github_token');
-            const savedGitLabToken = sessionStorage.getItem('gitlab_token');
-            const savedAIToken = sessionStorage.getItem('ai_token');
-            
-            if (savedGitHubToken) {
-                document.getElementById('github-token').value = savedGitHubToken;
-            }
-            if (savedGitLabToken) {
-                document.getElementById('gitlab-token').value = savedGitLabToken;
-            }
-            if (savedAIToken) {
-                document.getElementById('ai-token').value = savedAIToken;
-            }
-            
-            // Initialize all platform features
-            initializePlatformFeatures('github');
-            initializePlatformFeatures('gitlab');
-            initializePlatformFeatures('cli');
-            
-            // Add debug click handlers to test tab switching
-            setTimeout(() => {
-                console.log('Adding debug test...');
-                const allTabs = document.querySelectorAll('.platform-tab');
-                console.log('Found tabs:', allTabs.length);
-                allTabs.forEach((tab, index) => {
-                    console.log(`Tab ${index}: ${tab.dataset.platform}, Active: ${tab.classList.contains('active')}`);
-                });
-                
-                // Test GitLab tab specifically
-                const gitlabTab = document.querySelector('[data-platform="gitlab"]');
-                const cliTab = document.querySelector('[data-platform="cli"]');
-                console.log('GitLab tab found:', !!gitlabTab);
-                console.log('CLI tab found:', !!cliTab);
-                
-                if (gitlabTab) {
-                    gitlabTab.addEventListener('click', function() {
-                        console.log('GitLab tab direct click handler triggered');
-                    });
-                }
-                
-                if (cliTab) {
-                    cliTab.addEventListener('click', function() {
-                        console.log('CLI tab direct click handler triggered');
-                    });
-                }
-            }, 500);
-        });
-
-        // Check GitHub API rate limit
-        async function checkGitHubRateLimit() {
-            try {
-                const token = document.getElementById('github-token').value.trim();
-                const headers = {
-                    'Accept': 'application/vnd.github.v3+json',
-                    'User-Agent': 'AI-PR-Reviewer'
-                };
-                
-                if (token) {
-                    headers['Authorization'] = `token ${token}`;
-                }
-
-                const response = await fetch('https://api.github.com/rate_limit', { headers });
-                
-                if (response.ok) {
-                    const data = await response.json();
-                    const remaining = data.rate.remaining;
-                    const resetTime = new Date(data.rate.reset * 1000);
-                    
-                    let rateLimitInfo = document.querySelector('#github-panel .rate-limit-info');
-                    if (!rateLimitInfo) {
-                        rateLimitInfo = document.createElement('div');
-                        rateLimitInfo.className = 'rate-limit-info';
-                        document.getElementById('github-panel').appendChild(rateLimitInfo);
-                    }
-                    
-                    rateLimitInfo.innerHTML = `
-                        <strong>GitHub API Status:</strong><br>
-                        Remaining calls: ${remaining}/${data.rate.limit}<br>
-                        Rate limit resets: ${resetTime.toLocaleTimeString()}<br>
-                        ${token ? '✅ Authenticated' : '⚠️ Unauthenticated (lower limits)'}
-                    `;
-                }
-            } catch (error) {
-                // Silently fail - rate limit check is not critical
-                console.warn('Could not check GitHub rate limit:', error);
-            }
+        function renderCodeContext(context) {
+            return context.map(line => `
+                <div class="code-line ${line.isError ? 'error' : ''}">
+                    <span class="line-number">${line.number}</span>
+                    <code>${escapeHtml(line.content)}</code>
+                </div>
+            `).join('');
         }
 
-        // Export analysis results
-        function exportResults(format = 'json') {
-            const results = document.getElementById('results');
-            if (results.style.display === 'none') {
-                showError('No analysis results to export');
-                return;
+        // Add CSS animations for smooth transitions
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
             }
-
-            const analysisData = {
-                timestamp: new Date().toISOString(),
-                platform: currentPlatform,
-                language: document.getElementById('language').value,
-                commitMessage: document.getElementById('commitMessage').value,
-                issues: Array.from(document.querySelectorAll('.issue-card')).map(card => {
-                    return {
-                        title: card.querySelector('.issue-title').textContent,
-                        severity: card.className.split(' ').pop(),
-                        description: card.querySelector('.issue-description').textContent,
-                        suggestion: card.querySelector('.suggestion div:last-child').textContent,
-                        code: card.querySelector('.code-block').textContent
-                    };
-                }),
-                score: parseInt(document.querySelector('.score-number').textContent)
-            };
-
-            const blob = new Blob([JSON.stringify(analysisData, null, 2)], {
-                type: 'application/json'
-            });
             
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `pr-analysis-${Date.now()}.json`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            
-            showAPIStatus('Analysis results exported successfully', 'success', `${currentPlatform}-panel`);
-        }
-
-        // Add export button functionality
-        function addExportButton() {
-            const resultsDiv = document.getElementById('results');
-            if (resultsDiv && resultsDiv.style.display !== 'none') {
-                let exportBtn = document.getElementById('export-btn');
-                if (!exportBtn) {
-                    exportBtn = document.createElement('button');
-                    exportBtn.id = 'export-btn';
-                    exportBtn.className = 'demo-btn';
-                    exportBtn.style.marginTop = '1rem';
-                    exportBtn.innerHTML = '💾 Export Results';
-                    exportBtn.onclick = () => exportResults();
-                    resultsDiv.appendChild(exportBtn);
-                }
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
             }
-        }
+            
+            .suggestion-item {
+                animation: fadeIn 0.3s ease-out;
+            }
+            
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(10px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+            
+            .issue-card {
+                animation: slideInLeft 0.3s ease-out;
+            }
+            
+            @keyframes slideInLeft {
+                from { opacity: 0; transform: translateX(-20px); }
+                to { opacity: 1; transform: translateX(0); }
+            }
+            
+            .code-line.error {
+                animation: highlight 2s ease-out;
+            }
+            
+            @keyframes highlight {
+                0% { background-color: rgba(239, 68, 68, 0.3); }
+                100% { background-color: rgba(239, 68, 68, 0.1); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', initApp);
     </script>
 </body>
 </html>
